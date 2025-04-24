@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.wenziyue</groupId>
+    <artifactId>wenziyue-blog</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>common</module>
+        <module>dal</module>
+        <module>biz</module>
+        <module>web</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+    </properties>
+
+    <!-- Spring Boot 版本管理 -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- 自定义 Starter: 统一管理版本 -->
+            <dependency>
+                <groupId>com.wenziyue</groupId>
+                <artifactId>wenziyue-framework-starter</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.wenziyue</groupId>
+                <artifactId>wenziyue-mybatis-plus-starter</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.30</version>
+            </dependency>
+
+            <!-- MySQL 驱动 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>8.0.27</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 配置 GitHub Packages 仓库 -->
+    <repositories>
+        <!-- wenziyue-framework-starter -->
+        <repository>
+            <id>github-framework</id>
+            <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-framework-starter</url>
+        </repository>
+
+        <!-- wenziyue-mybatis-plus-starter -->
+        <repository>
+            <id>github-mybatis-plus</id>
+            <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-mybatis-plus-starter</url>
+        </repository>
+    </repositories>
+
+    <!-- 编译插件配置 -->
+    <build>
+        <plugins>
+            <!-- Maven Compiler 插件，指定 Java 版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
