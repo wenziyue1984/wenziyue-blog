@@ -36,3 +36,13 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Java
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+# IntelliJ IDEA
+.idea/
