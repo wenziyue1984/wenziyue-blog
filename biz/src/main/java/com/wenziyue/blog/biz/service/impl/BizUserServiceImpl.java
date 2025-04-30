@@ -5,6 +5,7 @@ import com.wenziyue.blog.biz.dao.UserPageDTO;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.blog.dal.service.UserService;
+import com.wenziyue.framework.starter.exception.ApiException;
 import com.wenziyue.mybatisplus.page.PageResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class BizUserServiceImpl implements BizUserService {
     public UserEntity queryUserById(Long id) {
         val po = userService.getById(id);
         if (po == null) {
-            throw new RuntimeException("无此用户");
+            throw new ApiException("800", "无此用户");
         }
         return po;
     }
