@@ -20,4 +20,6 @@ public interface BizUserService {
 
     @Transactional(readOnly = true)
     PageResult<UserEntity> pageUser(UserPageDTO dto);
+
+    Long testUid();
 }

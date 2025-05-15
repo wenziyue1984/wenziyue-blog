@@ -1,4 +1,6 @@
+
 -- 用户表
+-- drop table if exists TB_WZY_BLOG_USER;
 CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
 (
     `id`          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
@@ -21,10 +23,5 @@ CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
     COMMENT ='用户表';
-
-
-INSERT INTO TB_WZY_BLOG_USER (name, nickname, password, avatar_url, email, phone, bio, status, role)
-VALUES ('wenziyue', 'wzy', '12345678', 'https://example.com/avatar.jpg', 'wenziyue@example.com', '12345678901',
-        'A blog enthusiast', 0, 1);
 
 

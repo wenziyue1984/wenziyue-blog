@@ -5,8 +5,10 @@ import com.wenziyue.blog.biz.dao.UserPageDTO;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.blog.dal.service.UserService;
-import com.wenziyue.framework.starter.exception.ApiException;
+import com.wenziyue.framework.exception.ApiException;
 import com.wenziyue.mybatisplus.page.PageResult;
+import com.wenziyue.redis.utils.RedisUtils;
+import com.wenziyue.uid.utils.UidUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -23,6 +25,8 @@ import java.util.List;
 public class BizUserServiceImpl implements BizUserService {
 
     private final UserService userService;
+    private final RedisUtils redisUtils;
+    private final UidUtils uidUtils;
 
     @Override
     public List<UserEntity> queryUserList() {
@@ -45,5 +49,12 @@ public class BizUserServiceImpl implements BizUserService {
                 .like(dto.getName() != null, UserEntity::getName, dto.getName())
                 .like(dto.getEmail() != null, UserEntity::getEmail, dto.getEmail())
                 .orderByDesc(UserEntity::getUpdateTime));
+    }
+
+    @Override
+    public Long testUid() {
+        val id = uidUtils.nextId();
+        log.info("id:{}", id);
+        return id;
     }
 }

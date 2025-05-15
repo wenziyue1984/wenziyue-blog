@@ -1,7 +1,7 @@
 package com.wenziyue.blog.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.wenziyue.framework.starter.common.ICommonEnum;
+import com.wenziyue.framework.common.ICommonEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
