@@ -37,6 +37,10 @@
             <groupId>com.wenziyue</groupId>
             <artifactId>wenziyue-uid-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wenziyue</groupId>
+            <artifactId>wenziyue-idempotent-starter</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

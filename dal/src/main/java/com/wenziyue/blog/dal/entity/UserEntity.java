@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @TableName("TB_WZY_BLOG_USER")
 public class UserEntity extends BaseEntity {
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
     /**

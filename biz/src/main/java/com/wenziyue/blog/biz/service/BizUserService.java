@@ -22,4 +22,6 @@ public interface BizUserService {
     PageResult<UserEntity> pageUser(UserPageDTO dto);
 
     Long testUid();
+
+    void uidBenchMark() throws Exception;
 }

@@ -9,4 +9,5 @@ logging:
 wenziyue:
   # wenziyue-uid-starter
   uid:
-    step: 10
+    step: 50
+    prepare-next-percent: 70

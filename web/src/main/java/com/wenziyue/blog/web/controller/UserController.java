@@ -7,6 +7,7 @@ import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.framework.annotation.ResponseResult;
 import com.wenziyue.framework.trace.MdcExecutors;
 import com.wenziyue.framework.trace.MdcTaskDecorator;
+import com.wenziyue.idempotent.annotation.WenziyueIdempotent;
 import com.wenziyue.mybatisplus.page.PageResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class UserController {
     private final MdcTaskDecorator mdcTaskDecorator;
 
     @GetMapping("/{id}")
+    @WenziyueIdempotent(keys = {"#id"}, prefix = "idempotentTest", timeout = 600)
     public UserEntity testUser(@PathVariable("id") Long id) {
         return bizUserService.queryUserById(id);
     }
@@ -43,6 +45,27 @@ public class UserController {
     @GetMapping("/uid")
     public Long testUid() {
         return bizUserService.testUid();
+    }
+
+    /**
+     * 压测uid-starter
+     */
+    @GetMapping("/uidBenchMark")
+    public void uidBenchMark() {
+        try {
+            bizUserService.uidBenchMark();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 测试幂等注解
+     */
+    @GetMapping("/idempotentTest/{id}")
+    @WenziyueIdempotent(keys = {"#id"}, prefix = "idempotentTest", timeout = 600)
+    public void idempotentTest(@PathVariable String id) {
+        log.info("idempotentTest:{}", id);
     }
 
     @GetMapping(value = "/testasync")

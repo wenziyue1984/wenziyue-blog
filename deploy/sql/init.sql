@@ -1,7 +1,7 @@
 -- 用户表
 CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
 (
-    `id`          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    `id`          BIGINT       NOT NULL PRIMARY KEY COMMENT '主键ID',
     `version`     INT          NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
     `deleted`     TINYINT      NOT NULL DEFAULT 0 COMMENT '是否删除 0-正常 1-删除',
     `create_time` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -23,8 +23,5 @@ CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
     COMMENT ='用户表';
 
 
-INSERT INTO TB_WZY_BLOG_USER (name, nickname, password, avatar_url, email, phone, bio, status, role)
-VALUES ('wenziyue', 'wzy', '12345678', 'https://example.com/avatar.jpg', 'wenziyue@example.com', '12345678901',
-        'A blog enthusiast', 0, 1);
 
 

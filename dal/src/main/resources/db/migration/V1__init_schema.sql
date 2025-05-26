@@ -1,9 +1,7 @@
-
 -- 用户表
--- drop table if exists TB_WZY_BLOG_USER;
 CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
 (
-    `id`          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    `id`          BIGINT       NOT NULL PRIMARY KEY COMMENT '主键ID',
     `version`     INT          NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
     `deleted`     TINYINT      NOT NULL DEFAULT 0 COMMENT '是否删除 0-正常 1-删除',
     `create_time` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -20,8 +18,8 @@ CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
     INDEX `IDX_TB_WZY_BLOG_USER_NAME` (`name`),
     INDEX `IDX_TB_WZY_BLOG_USER_PHONE` (`phone`),
     INDEX `IDX_TB_WZY_BLOG_USER_EMAIL` (`email`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
+    ) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4
     COMMENT ='用户表';
 
 
