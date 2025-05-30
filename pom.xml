@@ -50,7 +50,7 @@
             <dependency>
                 <groupId>com.wenziyue</groupId>
                 <artifactId>wenziyue-security-starter</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.2</version>
             </dependency>
             <dependency>
                 <groupId>com.wenziyue</groupId>
@@ -65,6 +65,11 @@
             <dependency>
                 <groupId>com.wenziyue</groupId>
                 <artifactId>wenziyue-idempotent-starter</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wenziyue</groupId>
+                <artifactId>wenziyue-swagger-starter</artifactId>
                 <version>1.0.0</version>
             </dependency>
 

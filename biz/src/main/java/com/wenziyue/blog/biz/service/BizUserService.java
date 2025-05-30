@@ -1,6 +1,6 @@
 package com.wenziyue.blog.biz.service;
 
-import com.wenziyue.blog.biz.dao.UserPageDTO;
+import com.wenziyue.blog.biz.dto.UserPageDTO;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.mybatisplus.page.PageResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,4 @@ public interface BizUserService {
     @Transactional(readOnly = true)
     PageResult<UserEntity> pageUser(UserPageDTO dto);
 
-    Long testUid();
-
-    void uidBenchMark() throws Exception;
 }

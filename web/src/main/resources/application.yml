@@ -53,9 +53,10 @@ mybatis-plus:
 wenziyue:
   # wenziyue-security-starter
   security:
-    default-login-enabled: true  # 或者干脆不写，让它默认 true
+    default-login-enabled: false  # 是否开启默认登录接口，默认false
+    tokenHeader: Authorization
     white-list:
-      - "/user/*"
+      - "/user/**"
   # wenziyue-uid-starter
   uid:
     biz-tag: blog
@@ -68,12 +69,29 @@ wenziyue:
     enabled: true          # 是否启用（默认 true）
     default-timeout: 60    # 默认过期秒数，默认60s
     clean-on-error: false   # 业务异常时是否删除 Redis key
+  # wenziyue-swagger-starter
+  swagger:
+    active-profiles: dev,test
+    title: Wenziyue Blog API
+    version: 0.0.1
+    base-package: com.wenziyue.blog.web   # 只扫描 Controller 包
+
+
+# swagger-ui 配置
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+    url: /v3/api-docs          # 明确告诉 UI 去这里拿接口定义
+
 
 logging:
   level:
     root: INFO
   file:
     path: ./logs
+
 
 logback:
   filesize: 50MB

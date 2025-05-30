@@ -11,3 +11,19 @@ wenziyue:
   uid:
     step: 50
     prepare-next-percent: 70
+  # wenziyue-security-starter
+  security:
+    white-list:
+      - "/user/**"
+      - "/test/**"
+      - "/testLogin/**"
+
+
+# swagger-ui 配置
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    url: /v3/api-docs          # 明确告诉 UI 去这里拿接口定义
+

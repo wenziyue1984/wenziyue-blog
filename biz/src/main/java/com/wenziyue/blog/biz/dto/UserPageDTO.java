@@ -1,6 +1,7 @@
-package com.wenziyue.blog.biz.dao;
+package com.wenziyue.blog.biz.dto;
 
 import com.wenziyue.mybatisplus.page.PageRequest;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,10 +14,13 @@ public class UserPageDTO extends PageRequest {
 
     private static final long serialVersionUID = 4009990582488251538L;
 
+    @Schema(description = "用户id", example = "1")
     private Long id;
 
+    @Schema(description = "用户名称", example = "wenziyue")
     private String name;
 
+    @Schema(description = "邮箱", example = "example@xxx.com")
     private String email;
 
     @Override

@@ -66,15 +66,17 @@
     </appender>
 
     <!-- 各环境日志级别 -->
+    <!-- 针对 dev 的特定输出 -->
     <springProfile name="dev">
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="ERROR"/>
             <appender-ref ref="INFO"/>
         </root>
     </springProfile>
 
-    <springProfile name="test,online">
+    <!-- 其他任何 profile 都走这里 -->
+    <springProfile name="!dev">
         <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="ERROR"/>
