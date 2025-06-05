@@ -1,4 +1,4 @@
-package com.wenziyue.blog.biz.dto;
+package com.wenziyue.blog.dal.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -29,5 +29,23 @@ public class LoginDTO implements Serializable {
      * 验证码
      */
     @Schema(description = "验证码", example = "0000")
-    private String verificationCode;
+    private String captchaCode;
+
+    /**
+     * 验证码uuid
+     */
+    @Schema(description = "验证码uuid", example = "80fb0f05-e32b-452c-9713-6b7a5047d792")
+    private String captchaUuid;
+
+    /**
+     * google登录code
+     */
+    @Schema(description = "google登录code", example = "0000")
+    private String googleCode;
+
+    /**
+     * google登录state
+     */
+    @Schema(description = "google登录state", example = "xyz")
+    private String googleState;
 }

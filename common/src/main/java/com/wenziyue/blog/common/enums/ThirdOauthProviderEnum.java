@@ -6,19 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 用户角色枚举
- * 0 - 用户，1 - 管理员
+ * @author wenziyue
  */
 @Getter
 @AllArgsConstructor
-public enum UserRoleEnum implements ICommonEnum {
-    USER(0, "用户", "USER"),
-    ADMIN(1, "管理员", "ADMIN");
+public enum ThirdOauthProviderEnum implements ICommonEnum {
+
+    GITHUB(0, "github"),
+    GOOGLE(1, "google");
 
     @EnumValue
     private final Integer code;
     private final String desc;
-    private final String role;
 
 
 }

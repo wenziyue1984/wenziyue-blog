@@ -36,11 +36,18 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- 自定义 Starter: 统一管理版本 -->
             <dependency>
                 <groupId>com.wenziyue</groupId>
                 <artifactId>wenziyue-framework-starter</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>com.wenziyue</groupId>
@@ -50,7 +57,7 @@
             <dependency>
                 <groupId>com.wenziyue</groupId>
                 <artifactId>wenziyue-security-starter</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>com.wenziyue</groupId>
@@ -120,6 +127,21 @@
                 <artifactId>flyway-mysql</artifactId>   <!-- 专门支持 MySQL / MariaDB -->
                 <version>9.22.2</version>               <!-- 跟 core 保持同版本 -->
             </dependency>
+
+            <!-- Jackson -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.13.5</version>
+            </dependency>
+
+            <!-- hutool -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>5.8.38</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

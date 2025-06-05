@@ -1,6 +1,6 @@
 package com.wenziyue.blog.web.controller;
 
-import com.wenziyue.blog.biz.dto.UserPageDTO;
+import com.wenziyue.blog.dal.dto.UserPageDTO;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.framework.annotation.ResponseResult;
@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -25,8 +26,6 @@ public class UserController {
 
     private final BizUserService bizUserService;
 
-    // 登录接口已经集成在
-
     @Operation(summary = "用户详情", description = "返回用户信息")
     @GetMapping("/{id}")
     public UserEntity testUser(@Parameter(description = "用户id", required = true) @PathVariable("id") Long id) {
@@ -35,6 +34,8 @@ public class UserController {
 
     @Operation(summary = "分页查询用户信息", description = "分页结果")
     @GetMapping("/page")
+//    @PreAuthorize("hasRole('ADMIN')") // 如果使用 hasRole('ADMIN') 的话需要在security的User.authorities中的authority前加ROLE_前缀：[{"authority": "ROLE_ADMIN"}]
+    @PreAuthorize("hasAuthority('ADMIN')") //security的User.authorities：[{"authority": "ADMIN"}]
     public PageResult<UserEntity> listProducts(@Parameter(description = "分页请求参数", required = true) UserPageDTO dto) {
         log.info("dto:{}", dto);
         return bizUserService.pageUser(dto);

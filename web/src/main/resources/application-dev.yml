@@ -5,18 +5,19 @@ mybatis-plus:
 logging:
   level:
     com.wzy: DEBUG # 根日志级别
+    com.baomidou.mybatisplus.extension.handlers: DEBUG
 
 wenziyue:
   # wenziyue-uid-starter
   uid:
-    step: 50
+    step: 10
     prepare-next-percent: 70
   # wenziyue-security-starter
   security:
     white-list:
-      - "/user/**"
       - "/test/**"
-      - "/testLogin/**"
+      - "/auth/**"
+      - "/captcha/**"
 
 
 # swagger-ui 配置

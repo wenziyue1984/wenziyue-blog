@@ -31,10 +31,6 @@
 
         <dependency>
             <groupId>com.wenziyue</groupId>
-            <artifactId>wenziyue-security-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wenziyue</groupId>
             <artifactId>wenziyue-uid-starter</artifactId>
         </dependency>
         <dependency>

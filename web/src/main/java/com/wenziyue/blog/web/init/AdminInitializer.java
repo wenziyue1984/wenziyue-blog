@@ -13,8 +13,8 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * 初始化管理员账号
@@ -28,6 +28,7 @@ public class AdminInitializer implements ApplicationListener<ApplicationReadyEve
 
     private final UserMapper userMapper;
     private final IdGen idGen;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${blog.init-admin:true}")
     private boolean initAdminEnabled;
@@ -64,8 +65,7 @@ public class AdminInitializer implements ApplicationListener<ApplicationReadyEve
 
 //            admin.setId(100000000000000001L);
             admin.setName(defaultName);
-            admin.setNickname("wenziyue");
-            admin.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+            admin.setPassword(passwordEncoder.encode(defaultPassword));
             admin.setBio("管理员");
             admin.setRole(UserRoleEnum.ADMIN);   // 管理员
             admin.setStatus(UserStatusEnum.ENABLED); // 正常

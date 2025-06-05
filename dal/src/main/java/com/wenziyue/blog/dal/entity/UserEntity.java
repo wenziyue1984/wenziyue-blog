@@ -29,12 +29,6 @@ public class UserEntity extends BaseEntity {
     private String name;
 
     /**
-     * 昵称
-     */
-    @TableField("nickname")
-    private String nickname;
-
-    /**
      * 密码（加密后的）
      */
     @TableField("password")

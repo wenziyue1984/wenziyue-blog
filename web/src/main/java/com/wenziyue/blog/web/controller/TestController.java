@@ -1,6 +1,9 @@
 package com.wenziyue.blog.web.controller;
 
 import com.wenziyue.blog.biz.service.impl.AsyncService;
+import com.wenziyue.blog.common.enums.ThirdOauthProviderEnum;
+import com.wenziyue.blog.dal.entity.ThirdOauthEntity;
+import com.wenziyue.blog.dal.service.ThirdOauthService;
 import com.wenziyue.framework.annotation.ResponseResult;
 import com.wenziyue.framework.trace.MdcExecutors;
 import com.wenziyue.framework.trace.MdcTaskDecorator;
@@ -15,11 +18,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * @author wenziyue
@@ -34,6 +40,7 @@ public class TestController {
     private final AsyncService asyncService;
     private final MdcTaskDecorator mdcTaskDecorator;
     private final IdGen idGen;
+    private final ThirdOauthService thirdOathService;
 
     /**
      * 测试uid-starter
@@ -120,4 +127,36 @@ public class TestController {
 
         return "CompletableFuture 异步任务已提交";
     }
+
+    /**
+     * 测试mysql的json类型
+     */
+    @GetMapping("/testMysqlJson")
+    public String testmysqljson() {
+        ThirdOauthEntity thirdOathEntity = new ThirdOauthEntity();
+        val id = idGen.nextId().getId();
+        thirdOathEntity.setId(id);
+        thirdOathEntity.setUserId(1L);
+        thirdOathEntity.setProvider(ThirdOauthProviderEnum.GITHUB);
+        StringBuilder uidStringBuilder = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            uidStringBuilder.append((int) (Math.random() * 10)); // 生成 0-9 的随机数
+        }
+        thirdOathEntity.setProviderUid(uidStringBuilder.toString());
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "wenziyue");
+        thirdOathEntity.setExtra(map);
+        thirdOathService.save(thirdOathEntity);
+
+        val entity = thirdOathService.getById(id);
+        log.info("entity:{}", entity);
+        String name = entity.getExtra().get("name").toString();
+        log.info("name:{}", name);
+
+        thirdOathService.removeById(id);
+        return "测试成功";
+    }
+
+
+
 }

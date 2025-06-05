@@ -1,4 +1,4 @@
-package com.wenziyue.blog.biz.dto;
+package com.wenziyue.blog.dal.dto;
 
 import com.wenziyue.mybatisplus.page.PageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
