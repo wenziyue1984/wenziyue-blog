@@ -2,6 +2,7 @@ package com.wenziyue.blog.biz.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wenziyue.blog.biz.service.BizUserService;
+import com.wenziyue.blog.biz.utils.IdUtils;
 import com.wenziyue.blog.biz.utils.SecurityUtils;
 import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.common.exception.BlogResultCode;
@@ -14,7 +15,6 @@ import com.wenziyue.framework.exception.ApiException;
 import com.wenziyue.mybatisplus.page.PageResult;
 import com.wenziyue.redis.utils.RedisUtils;
 import com.wenziyue.security.utils.JwtUtils;
-import com.wenziyue.uid.common.Status;
 import com.wenziyue.uid.core.IdGen;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,12 +93,7 @@ public class BizUserServiceImpl implements BizUserService {
 
             //新建用户
             UserEntity userEntity = new UserEntity();
-            val result = idGen.nextId();
-            if (result.getStatus().equals(Status.EXCEPTION)) {
-                log.error("获取id异常:{}", result);
-                throw new ApiException(BlogResultCode.REGISTER_FAIL);
-            }
-            userEntity.setId(result.getId());
+            userEntity.setId(IdUtils.getID(idGen));
             userEntity.setName(dto.getName().trim());
             userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
             userEntity.setEmail(email);

@@ -1,7 +1,8 @@
 package com.wenziyue.blog.web.controller;
 
+import com.wenziyue.blog.dal.dto.GoogleLoginDTO;
 import com.wenziyue.blog.dal.dto.LoginDTO;
-import com.wenziyue.blog.biz.service.AuthService;
+import com.wenziyue.blog.biz.service.BizAuthService;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.dal.dto.RegisterDTO;
 import com.wenziyue.framework.annotation.ResponseResult;
@@ -27,7 +28,7 @@ import javax.validation.Valid;
 @Tag(name = "权限管理", description = "用户登录、注销、刷新token相关接口")
 public class AuthController {
 
-    private final AuthService authService;
+    private final BizAuthService bizAuthService;
     private final BizUserService bizUserService;
     @Value("${wenziyue.security.token-header}")
     private String tokenHeader;
@@ -49,7 +50,7 @@ public class AuthController {
     @Operation(summary = "用户登录", description = "返回token")
     @PostMapping("/login")
     public String login(@Parameter(description = "登录参数", required = true) @Valid @RequestBody LoginDTO dto) {
-        return authService.login(dto);
+        return bizAuthService.login(dto);
     }
 
     /**
@@ -58,7 +59,7 @@ public class AuthController {
     @Operation(summary = "退出登录", description = "注销token")
     @GetMapping("/logout")
     public boolean logout(HttpServletRequest request) {
-        return authService.logout(request.getHeader(tokenHeader));
+        return bizAuthService.logout(request.getHeader(tokenHeader));
     }
 
     /**
@@ -67,14 +68,14 @@ public class AuthController {
     @Operation(summary = "强制用户下线", description = "强制用户下线")
     @GetMapping("/forceLogout/{id}")
     public void forceLogout(@Parameter(description = "用户id", required = true) @PathVariable("id") Long id) {
-        authService.forceLogout(id);
+        bizAuthService.forceLogout(id);
     }
 
 
     @Operation(summary = "google登录", description = "返回token")
     @PostMapping("/googleLogin")
-    public String googleLogin(@Parameter(description = "google登录参数", required = true) @Valid @RequestBody LoginDTO dto) {
-        return authService.googleLogin(dto);
+    public String googleLogin(@Parameter(description = "google登录参数", required = true) @Valid @RequestBody GoogleLoginDTO dto) {
+        return bizAuthService.googleLogin(dto);
     }
 
 

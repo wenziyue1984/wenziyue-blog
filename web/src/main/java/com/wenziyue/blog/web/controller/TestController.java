@@ -1,5 +1,6 @@
 package com.wenziyue.blog.web.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.wenziyue.blog.biz.service.impl.AsyncService;
 import com.wenziyue.blog.common.enums.ThirdOauthProviderEnum;
 import com.wenziyue.blog.dal.entity.ThirdOauthEntity;
@@ -18,8 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -143,15 +142,16 @@ public class TestController {
             uidStringBuilder.append((int) (Math.random() * 10)); // 生成 0-9 的随机数
         }
         thirdOathEntity.setProviderUid(uidStringBuilder.toString());
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", "wenziyue");
-        thirdOathEntity.setExtra(map);
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject("wenziyue");
+        payload.setEmail("test@gmail.com");
+        thirdOathEntity.setExtra(payload);
         thirdOathService.save(thirdOathEntity);
 
         val entity = thirdOathService.getById(id);
         log.info("entity:{}", entity);
-        String name = entity.getExtra().get("name").toString();
-        log.info("name:{}", name);
+        String name = entity.getExtra().get("sub").toString();
+        log.info("sub:{}", name);
 
         thirdOathService.removeById(id);
         return "测试成功";

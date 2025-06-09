@@ -27,7 +27,7 @@ public class SecurityUtils {
                 userEntity.getRole().equals(UserRoleEnum.ADMIN) ?  UserRoleEnum.ADMIN.getRole() : UserRoleEnum.USER.getRole());
         val user = User.builder()
                 .username(userEntity.getName())
-                .password(userEntity.getPassword()) // 密文
+                .password(userEntity.getPassword() == null ? "" : userEntity.getPassword()) // 密文
                 .authorities(authorities) // 授权列表
                 .accountLocked(userEntity.getStatus().equals(UserStatusEnum.DISABLED)) // 禁用/锁定
                 .build();

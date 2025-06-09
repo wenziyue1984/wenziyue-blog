@@ -21,6 +21,7 @@ public enum BlogResultCode implements IResultCode {
     USER_NOT_EXIST("60070", "用户不存在"),
     LOGIN_PARAM_ERROR("60080", "用户名或密码错误"),
     LOGIN_PARAM_IS_EMPTY("60090", "登录参数为空"),
+    LOGIN_ERROR("60092", "登录失败"),
 
     CAPTCHA_IS_EMPTY("60100", "验证码参数为空"),
     CAPTCHA_HAS_EXPIRED("60100", "验证码已失效"),

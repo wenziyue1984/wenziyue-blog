@@ -37,6 +37,16 @@
             <groupId>com.wenziyue</groupId>
             <artifactId>wenziyue-idempotent-starter</artifactId>
         </dependency>
+
+        <!-- google登录 -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

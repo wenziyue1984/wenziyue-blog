@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `TB_WZY_BLOG_USER`
     `create_time` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `name`        VARCHAR(64)  NOT NULL COMMENT '用户名',
-    `password`    VARCHAR(255) NOT NULL COMMENT '密码（加密后的）',
+    `password`    VARCHAR(255)          DEFAULT NULL COMMENT '密码（加密后的）',
     `avatar_url`  VARCHAR(512)          DEFAULT NULL COMMENT '头像URL',
     `email`       VARCHAR(128)          DEFAULT NULL COMMENT '邮箱',
     `phone`       VARCHAR(20)           DEFAULT NULL COMMENT '手机号',

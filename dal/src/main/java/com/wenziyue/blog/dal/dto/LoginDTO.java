@@ -40,12 +40,7 @@ public class LoginDTO implements Serializable {
     /**
      * google登录code
      */
-    @Schema(description = "google登录code", example = "0000")
-    private String googleCode;
+    @Schema(description = "google登录token", example = "0000")
+    private String googleToken;
 
-    /**
-     * google登录state
-     */
-    @Schema(description = "google登录state", example = "xyz")
-    private String googleState;
 }
