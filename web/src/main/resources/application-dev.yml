@@ -14,10 +14,14 @@ wenziyue:
     prepare-next-percent: 70
   # wenziyue-security-starter
   security:
+    expire: 240000 # token过期时间，测试两分钟
+    refresh-before-expiration: 120000  # 刷新token时间，测试一分钟
     white-list:
       - "/test/**"
-      - "/auth/**"
       - "/captcha/**"
+      - "/auth/register"
+      - "/auth/login"
+      - "/auth/googleLogin"
 
 
 # swagger-ui 配置

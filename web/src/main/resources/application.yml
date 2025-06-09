@@ -54,14 +54,20 @@ wenziyue:
   # wenziyue-security-starter
   security:
     default-login-enabled: false  # 是否开启默认登录接口，默认false
-    tokenHeader: Authorization
-    refreshTokenHeader: X-Refresh-Token  # 刷新token时返回的header头
-    expire: 604800000 # token过期时间，默认7天
-    refresh-before-expiration: 86400000  # 刷新token时间，默认1天
+    token-header: Authorization
+    token-prefix: Bearer
+    refresh-token-header: X-Refresh-Token  # 刷新token时返回的header头
+    expire: 604800000 # token过期时间，默认7天，单位毫秒
+    refresh-before-expiration: 86400000  # 刷新token时间，默认1天，单位毫秒
+#    expire: 120000 # token过期时间，测试两分钟
+#    refresh-before-expiration: 60000  # 刷新token时间，测试一分钟
     jwt-secret: ${JWT_SECRET:jwt-secret}
     white-list:
-      - "/auth/**"
+      - "/test/**"
       - "/captcha/**"
+      - "/auth/register"
+      - "/auth/login"
+      - "/auth/googleLogin"
   # wenziyue-uid-starter
   uid:
     biz-tag: blog

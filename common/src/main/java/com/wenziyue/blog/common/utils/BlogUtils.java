@@ -20,7 +20,7 @@ public class BlogUtils {
      * safeTrim增强，如果safeTrim()返回空字符串，则返回null
      * 防止数据库插入空字符串
      */
-        public static String safeTrimEmptyIsNull(String str) {
+    public static String safeTrimEmptyIsNull(String str) {
         val trim = safeTrim(str);
         return trim == null || trim.isEmpty() ? null : trim;
     }
