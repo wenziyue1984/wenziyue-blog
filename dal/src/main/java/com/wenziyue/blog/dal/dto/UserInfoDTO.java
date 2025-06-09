@@ -16,28 +16,28 @@ public class UserInfoDTO implements Serializable {
 
     private static final long serialVersionUID = -4295527761015760446L;
 
-    @Schema(description = "id", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long id;
 
-    @Schema(description = "用户名（唯一）", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "用户名（唯一）")
     private String name;
 
-    @Schema(description = "头像 URL", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "头像 URL", requiredMode = Schema.RequiredMode.AUTO)
     private String avatarUrl;
 
-    @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.AUTO)
     private String email;
 
-    @Schema(description = "手机号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "手机号", requiredMode = Schema.RequiredMode.AUTO)
     private String phone;
 
-    @Schema(description = "简介", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "简介", requiredMode = Schema.RequiredMode.AUTO)
     private String bio;
 
-    @Schema(description = "用户状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "用户状态", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private UserStatusEnum status;
 
-    @Schema(description = "用户角色", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "用户角色", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private UserRoleEnum role;
 
     public UserInfoDTO(UserEntity userEntity) {

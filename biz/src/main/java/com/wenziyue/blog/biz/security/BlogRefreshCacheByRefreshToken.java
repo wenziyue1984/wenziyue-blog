@@ -1,5 +1,6 @@
 package com.wenziyue.blog.biz.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wenziyue.blog.biz.utils.SecurityUtils;
 import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.common.exception.BlogResultCode;
@@ -16,8 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author wenziyue
  */
@@ -30,6 +29,8 @@ public class BlogRefreshCacheByRefreshToken implements RefreshCacheByRefreshToke
     private final RedisUtils redisUtils;
     private final JwtUtils jwtUtils;
     private final UserService userService;
+    private final ObjectMapper objectMapper;
+
     @Value("${wenziyue.security.expire}")
     private Long expire;
 
@@ -54,10 +55,8 @@ public class BlogRefreshCacheByRefreshToken implements RefreshCacheByRefreshToke
                 throw new ApiException(BlogResultCode.USER_NOT_EXIST);
             }
 
-            // 将用户信息存入redis
-            SecurityUtils.userInfoSaveInRedis(redisUtils, userEntity, newToken, expire);
-            // 维护用户的所有活跃token
-            redisUtils.sAddAndExpire(RedisConstant.USER_TOKENS_KEY + userIdFromToken, expire, TimeUnit.MILLISECONDS, newToken);
+            // 将用户信息存入redis && 维护用户的所有活跃token
+            SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, newToken, oldToken, expire, objectMapper);
         } catch (JwtException | ApiException e) {
             throw e;
         } catch (Exception e) {

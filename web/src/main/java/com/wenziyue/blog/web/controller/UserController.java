@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * @author wenziyue
  */
@@ -51,15 +53,16 @@ public class UserController {
         return bizUserService.userInfo();
     }
 
-    //修改个人资料 可更新昵称、头像、简介等字段（不改账号）
+    /**
+     * 因为登录后redis中存有用户信息，所以修改用户信息后，需要更新redis中的用户信息
+     */
+    @Operation(summary = "修改个人资料", description = "可更新昵称、头像、简介等字段（不改账号）")
+    @PostMapping("/updateUserInfo")
+    public void updateUserInfo(@Parameter(description = "修改个人资料参数", required = true) @Valid @RequestBody UserInfoDTO dto) {
+        bizUserService.updateUserInfo(dto);
+    }
 
     //修改密码 提供旧密码验证后更改新密码功能
-
-    //查询作者主页 通过 userId 查询某个作者的公开信息及文章列表
-
-    //校验用户名是否重复 注册页实时校验接口，前端常见需求
-
-    //是否已登录 前端调用时判断是否为登录状态（可返回简要信息）
 
     // TODO 管理后台
 

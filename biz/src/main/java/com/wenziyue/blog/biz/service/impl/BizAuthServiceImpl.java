@@ -1,6 +1,7 @@
 package com.wenziyue.blog.biz.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -48,6 +49,7 @@ public class BizAuthServiceImpl implements BizAuthService {
     private final RedisUtils redisUtils;
     private final ThirdOauthService thirdOauthService;
     private final IdGen idGen;
+    private final ObjectMapper objectMapper;
 
     @Value("${wenziyue.security.expire}")
     private Long expire;
@@ -97,10 +99,9 @@ public class BizAuthServiceImpl implements BizAuthService {
         // 生成token
         val token = jwtUtils.generateToken(userEntity.getId().toString());
 
-        // 将用户信息存入redis
-        SecurityUtils.userInfoSaveInRedis(redisUtils, userEntity, token, expire);
-        // 维护用户的所有活跃token
-        redisUtils.sAddAndExpire(RedisConstant.USER_TOKENS_KEY + userEntity.getId(), expire, TimeUnit.MILLISECONDS, token);
+        // 将用户信息存入redis && 维护用户的所有活跃token
+        SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, token, null, expire, objectMapper);
+
         return token;
     }
 
@@ -159,8 +160,7 @@ public class BizAuthServiceImpl implements BizAuthService {
             val token = jwtUtils.generateToken(userEntity.getId().toString());
 
             // 5. 缓存用户信息 + 维护活跃集合
-            SecurityUtils.userInfoSaveInRedis(redisUtils, userEntity, token, expire);
-            redisUtils.sAddAndExpire(RedisConstant.USER_TOKENS_KEY + userEntity.getId(), expire, TimeUnit.MILLISECONDS, token);
+            SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, token, null, expire, objectMapper);
             return token;
         } catch (Exception e) {
             log.error("google登录异常", e);

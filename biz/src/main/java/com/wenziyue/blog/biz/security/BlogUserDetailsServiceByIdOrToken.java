@@ -1,5 +1,6 @@
 package com.wenziyue.blog.biz.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.common.enums.UserRoleEnum;
 import com.wenziyue.blog.common.enums.UserStatusEnum;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author wenziyue
@@ -29,6 +31,7 @@ import java.util.List;
 public class BlogUserDetailsServiceByIdOrToken implements UserDetailsServiceByIdOrToken {
 
     private final RedisUtils redisUtils;
+    private final ObjectMapper objectMapper;
 
     /**
      * 根据id从redis中获取用户信息，如果不存在则认为token无效
@@ -43,9 +46,12 @@ public class BlogUserDetailsServiceByIdOrToken implements UserDetailsServiceById
             throw new JwtException("redis中不存在登录的用户信息,id:" + id + "; token:" + token);
         }
         // 如果该token已不在用户活跃token集合中，则视为无效token，并且删除redis中的用户信息
-        if (!redisUtils.sIsMember(RedisConstant.USER_TOKENS_KEY + id, token)) {
-            redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + token);
-            throw new JwtException("token已不再活跃集合中");
+        val sMembers = redisUtils.sMembers(RedisConstant.USER_TOKENS_KEY + id);
+        if (sMembers == null || sMembers.isEmpty()) {
+            throw new JwtException("活跃token集合为空");
+        }
+        if (!checkTokenIsActive(sMembers, token)) {
+            throw new JwtException("token已失效");
         }
         // 角色权限(简易版本，如有需要可扩充)
         List<GrantedAuthority> authorities = Collections.singletonList((GrantedAuthority) () ->
@@ -54,5 +60,23 @@ public class BlogUserDetailsServiceByIdOrToken implements UserDetailsServiceById
                 , true, true, true
                 , userEntity.getStatus().equals(UserStatusEnum.ENABLED), authorities);
         return new BlogUserDetails(userEntity, user);
+    }
+
+    /**
+     * 检查sMembers中是否有该token，并且token没有过期
+     * @return true:token有效，false:token无效
+     */
+    private boolean checkTokenIsActive(Set<Object> sMembers, String token) {
+        for (Object member : sMembers) {
+            // 使用jackson将member反序列化为TokenExpireDTO
+            val tokenExpireDTO = objectMapper.convertValue(member, TokenExpireDTO.class);
+            if (token.equals(tokenExpireDTO.getToken())) {
+                if (System.currentTimeMillis() < tokenExpireDTO.getExpireTimeStamp()) {
+                    return true;
+                }
+                throw new JwtException("token已过期");
+            }
+        }
+        return false;
     }
 }

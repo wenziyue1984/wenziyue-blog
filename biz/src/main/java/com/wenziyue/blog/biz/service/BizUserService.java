@@ -28,4 +28,7 @@ public interface BizUserService {
 
     @Transactional(readOnly = true)
     UserInfoDTO userInfo();
+
+    @Transactional
+    void updateUserInfo(UserInfoDTO dto);
 }

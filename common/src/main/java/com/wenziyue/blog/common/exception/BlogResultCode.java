@@ -28,6 +28,8 @@ public enum BlogResultCode implements IResultCode {
     CAPTCHA_IS_ERROR("60100", "验证码错误"),
 
     REFRESH_TOKEN_ERROR("60110", "验证码错误"),
+
+    UPDATE_USER_INFO_ERROR("60120", "更新用户信息失败"),
     ;
 
     private final String code;
