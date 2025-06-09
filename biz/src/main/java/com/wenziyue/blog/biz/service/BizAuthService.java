@@ -4,6 +4,8 @@ import com.wenziyue.blog.dal.dto.GoogleLoginDTO;
 import com.wenziyue.blog.dal.dto.LoginDTO;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author wenziyue
  */
@@ -15,7 +17,10 @@ public interface BizAuthService {
     @Transactional
     String googleLogin(GoogleLoginDTO dto);
 
-    boolean logout(String authorization);
+    boolean logout(HttpServletRequest request);
 
     void forceLogout(Long string);
+
+    @Transactional(readOnly = true)
+    boolean nameExists(String name);
 }

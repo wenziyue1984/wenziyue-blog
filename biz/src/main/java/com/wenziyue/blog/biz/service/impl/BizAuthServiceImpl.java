@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.wenziyue.blog.biz.utils.IdUtils;
 import com.wenziyue.blog.biz.utils.SecurityUtils;
 import com.wenziyue.blog.common.constants.RedisConstant;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -51,6 +53,8 @@ public class BizAuthServiceImpl implements BizAuthService {
     private Long expire;
     @Value("${wenziyue.security.token-prefix}")
     private String tokenPrefix;
+    @Value("${wenziyue.security.token-header}")
+    private String tokenHeader;
     @Value("${wenziyue.security.google.client-id}")
     private String googleClientId;
 
@@ -60,20 +64,20 @@ public class BizAuthServiceImpl implements BizAuthService {
         if (dto == null) {
             throw new ApiException(BlogResultCode.LOGIN_PARAM_IS_EMPTY);
         }
-        // 校验验证码
-        if (dto.getCaptchaCode() == null || dto.getCaptchaCode().isEmpty()
-                || dto.getCaptchaUuid() == null || dto.getCaptchaUuid().isEmpty()) {
-            throw new ApiException(BlogResultCode.CAPTCHA_IS_EMPTY);
-        }
-        val captcha = redisUtils.get(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid(), String.class);
-        if (captcha == null) {
-            throw new ApiException(BlogResultCode.CAPTCHA_HAS_EXPIRED);
-        }
-        if (!dto.getCaptchaCode().equals(captcha)) {
-            throw new ApiException(BlogResultCode.CAPTCHA_IS_ERROR);
-        }
-        // 删除校验通过的验证码
-        redisUtils.delete(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid());
+//        // 校验验证码
+//        if (dto.getCaptchaCode() == null || dto.getCaptchaCode().isEmpty()
+//                || dto.getCaptchaUuid() == null || dto.getCaptchaUuid().isEmpty()) {
+//            throw new ApiException(BlogResultCode.CAPTCHA_IS_EMPTY);
+//        }
+//        val captcha = redisUtils.get(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid(), String.class);
+//        if (captcha == null) {
+//            throw new ApiException(BlogResultCode.CAPTCHA_HAS_EXPIRED);
+//        }
+//        if (!dto.getCaptchaCode().equals(captcha)) {
+//            throw new ApiException(BlogResultCode.CAPTCHA_IS_ERROR);
+//        }
+//        // 删除校验通过的验证码
+//        redisUtils.delete(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid());
 
         // 校验登录信息
         if (dto.getName() == null || dto.getName().isEmpty()
@@ -105,7 +109,7 @@ public class BizAuthServiceImpl implements BizAuthService {
         try {
             // 1. 验证 ID Token
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
-                    new NetHttpTransport(), com.google.api.client.json.gson.GsonFactory.getDefaultInstance())
+                    new NetHttpTransport(), GsonFactory.getDefaultInstance())
                     .setAudience(Collections.singletonList(googleClientId))
                     .build();
 
@@ -168,11 +172,11 @@ public class BizAuthServiceImpl implements BizAuthService {
      * 将redis中的用户信息作为token是否有效的依据，如果存在则认为token有效，否则认为token无效
      */
     @Override
-    public boolean logout(String authorization) {
-        if (authorization == null || !authorization.startsWith(tokenPrefix) || authorization.length() <= tokenPrefix.length() + 1) {
+    public boolean logout(HttpServletRequest request) {
+        String token = SecurityUtils.getTokenFromRequest(request, tokenHeader, tokenPrefix);
+        if (token == null) {
             return false;
         }
-        String token = authorization.substring(tokenPrefix.length() + 1);
         // 删除redis中的用户信息
         redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + token);
         // 解析用户id
@@ -190,5 +194,11 @@ public class BizAuthServiceImpl implements BizAuthService {
         }
         tokenSet.forEach(token -> redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + token.toString()));
         redisUtils.delete(RedisConstant.USER_TOKENS_KEY + id);
+    }
+
+    @Override
+    public boolean nameExists(String name) {
+        val list = userService.list(Wrappers.<UserEntity>lambdaQuery().eq(UserEntity::getName, name.trim()));
+        return !list.isEmpty();
     }
 }

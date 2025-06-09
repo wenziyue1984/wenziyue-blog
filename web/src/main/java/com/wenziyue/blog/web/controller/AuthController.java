@@ -42,6 +42,12 @@ public class AuthController {
         return bizUserService.register(dto);
     }
 
+    @Operation(summary = "用户名是否存在", description = "true存在false不存在")
+    @GetMapping("/nameExists/{name}")
+    public boolean nameExists(@Parameter(description = "用户名", required = true) @PathVariable("name") String name) {
+        return bizAuthService.nameExists(name);
+    }
+
     /**
      * 登录流程：校验验证码 -> 校验用户名密码 -> 生成token -> 保存用户信息到redis -> 维护redis中用户活跃token集合 -> 返回token
      * 其中保存用户信息到redis时，key为token，过期时间与token过期时间一致，将此缓存作为校验token的依据，这样用户在不同客户端登录时互不影响。
@@ -59,7 +65,7 @@ public class AuthController {
     @Operation(summary = "退出登录", description = "注销token")
     @GetMapping("/logout")
     public boolean logout(HttpServletRequest request) {
-        return bizAuthService.logout(request.getHeader(tokenHeader));
+        return bizAuthService.logout(request);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.wenziyue.blog.biz.service;
 
 import com.wenziyue.blog.dal.dto.RegisterDTO;
+import com.wenziyue.blog.dal.dto.UserInfoDTO;
 import com.wenziyue.blog.dal.dto.UserPageDTO;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.mybatisplus.page.PageResult;
@@ -24,4 +25,7 @@ public interface BizUserService {
 
     @Transactional
     String register(RegisterDTO dto);
+
+    @Transactional(readOnly = true)
+    UserInfoDTO userInfo();
 }

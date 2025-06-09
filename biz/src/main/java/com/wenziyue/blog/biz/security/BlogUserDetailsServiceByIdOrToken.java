@@ -1,6 +1,9 @@
 package com.wenziyue.blog.biz.security;
 
 import com.wenziyue.blog.common.constants.RedisConstant;
+import com.wenziyue.blog.common.enums.UserRoleEnum;
+import com.wenziyue.blog.common.enums.UserStatusEnum;
+import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.redis.utils.RedisUtils;
 import com.wenziyue.security.service.UserDetailsServiceByIdOrToken;
 import io.jsonwebtoken.JwtException;
@@ -8,9 +11,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author wenziyue
@@ -19,7 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary // 确保覆盖 Starter 中的 defaultUserDetailsServiceById
 @RequiredArgsConstructor
-public class BlogUserDetailsServiceById implements UserDetailsServiceByIdOrToken {
+public class BlogUserDetailsServiceByIdOrToken implements UserDetailsServiceByIdOrToken {
 
     private final RedisUtils redisUtils;
 
@@ -30,16 +37,22 @@ public class BlogUserDetailsServiceById implements UserDetailsServiceByIdOrToken
     @Override
     public UserDetails loadUserByUserIdOrToken(String id, String token) {
         // 先从redis中获取用户信息
-        val redisUser = redisUtils.get(RedisConstant.LOGIN_TOKEN_KEY + token, User.class);
-        if (redisUser == null) {
+        val userEntity = redisUtils.get(RedisConstant.LOGIN_TOKEN_KEY + token, UserEntity.class);
+        if (userEntity == null) {
             log.error("redis中不存在登录的用户信息:{}", id);
-            throw new JwtException("redis中不存在登录的用户信息:" + id);
+            throw new JwtException("redis中不存在登录的用户信息,id:" + id + "; token:" + token);
         }
         // 如果该token已不在用户活跃token集合中，则视为无效token，并且删除redis中的用户信息
         if (!redisUtils.sIsMember(RedisConstant.USER_TOKENS_KEY + id, token)) {
             redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + token);
             throw new JwtException("token已不再活跃集合中");
         }
-        return redisUser;
+        // 角色权限(简易版本，如有需要可扩充)
+        List<GrantedAuthority> authorities = Collections.singletonList((GrantedAuthority) () ->
+                userEntity.getRole().equals(UserRoleEnum.ADMIN) ?  UserRoleEnum.ADMIN.getRole() : UserRoleEnum.USER.getRole());
+        User user = new User(userEntity.getName(), userEntity.getPassword() == null ? "" : userEntity.getPassword()
+                , true, true, true
+                , userEntity.getStatus().equals(UserStatusEnum.ENABLED), authorities);
+        return new BlogUserDetails(userEntity, user);
     }
 }

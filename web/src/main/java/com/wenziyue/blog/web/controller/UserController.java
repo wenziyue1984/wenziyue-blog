@@ -1,5 +1,6 @@
 package com.wenziyue.blog.web.controller;
 
+import com.wenziyue.blog.dal.dto.UserInfoDTO;
 import com.wenziyue.blog.dal.dto.UserPageDTO;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.dal.entity.UserEntity;
@@ -44,13 +45,11 @@ public class UserController {
 
     //todo 用户模块
 
-    //用户注册 支持邮箱 / 手机号 + 密码注册（第一期只支持账号密码）
-
-    //用户登录 基于用户名 + 密码，登录成功发放 Token（JWT）
-
-    //用户退出 清除本地 Token 或 Redis 中记录（视登录方案而定）
-
-    //查看个人信息 返回当前登录用户的昵称、头像、创建时间等
+    @Operation(summary = "查看个人信息", description = "返回当前登录用户的昵称、头像、创建时间等")
+    @GetMapping("/userInfo")
+    public UserInfoDTO userInfo() {
+        return bizUserService.userInfo();
+    }
 
     //修改个人资料 可更新昵称、头像、简介等字段（不改账号）
 

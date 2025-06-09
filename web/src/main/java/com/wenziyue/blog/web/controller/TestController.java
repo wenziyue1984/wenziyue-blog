@@ -1,6 +1,7 @@
 package com.wenziyue.blog.web.controller;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.wenziyue.blog.biz.security.BlogUserDetails;
 import com.wenziyue.blog.biz.service.impl.AsyncService;
 import com.wenziyue.blog.common.enums.ThirdOauthProviderEnum;
 import com.wenziyue.blog.dal.entity.ThirdOauthEntity;
@@ -14,6 +15,7 @@ import com.wenziyue.uid.core.IdGen;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +57,7 @@ public class TestController {
      * 压测uid-starter
      */
     @GetMapping("/uidBenchMark")
-    public void uidBenchMark() throws Exception{
+    public void uidBenchMark() throws Exception {
 
         log.info("🚀 启动 Segment UID Benchmark...");
         int threadCount = 10;         // 并发线程数
@@ -157,6 +159,17 @@ public class TestController {
         return "测试成功";
     }
 
+    @GetMapping("/testSecurityContextHolder")
+    public String testSecurityContextHolder() {
+        val user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("user:{}", user);
 
+        BlogUserDetails blogUserDetails = user instanceof BlogUserDetails ? (BlogUserDetails) user : null;
+        log.info("blogUserDetails:{}", blogUserDetails);
+        val userEntity = blogUserDetails == null ? null : blogUserDetails.getUserEntity();
+        log.info("userEntity:{}", userEntity);
+
+        return blogUserDetails == null ? "null" : blogUserDetails.toString();
+    }
 
 }

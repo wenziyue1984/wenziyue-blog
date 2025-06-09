@@ -1,6 +1,7 @@
 package com.wenziyue.blog.biz.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.wenziyue.blog.biz.security.AuthHelper;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.biz.utils.IdUtils;
 import com.wenziyue.blog.biz.utils.SecurityUtils;
@@ -8,6 +9,7 @@ import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.common.utils.BlogUtils;
 import com.wenziyue.blog.dal.dto.RegisterDTO;
+import com.wenziyue.blog.dal.dto.UserInfoDTO;
 import com.wenziyue.blog.dal.dto.UserPageDTO;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.blog.dal.service.UserService;
@@ -40,6 +42,8 @@ public class BizUserServiceImpl implements BizUserService {
     private final IdGen idGen;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final AuthHelper authHelper;
+
     @Value("${wenziyue.security.expire}")
     private long expire;
 
@@ -118,6 +122,12 @@ public class BizUserServiceImpl implements BizUserService {
             log.error("用户注册异常", e);
             throw new ApiException(BlogResultCode.REGISTER_FAIL);
         }
+    }
+
+    @Override
+    public UserInfoDTO userInfo() {
+        val currentUser = authHelper.getCurrentUser();
+        return new UserInfoDTO(currentUser);
     }
 
 }
