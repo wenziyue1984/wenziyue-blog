@@ -9,9 +9,7 @@ import com.wenziyue.blog.biz.utils.SecurityUtils;
 import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.common.utils.BlogUtils;
-import com.wenziyue.blog.dal.dto.RegisterDTO;
-import com.wenziyue.blog.dal.dto.UserInfoDTO;
-import com.wenziyue.blog.dal.dto.UserPageDTO;
+import com.wenziyue.blog.dal.dto.*;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.blog.dal.service.UserService;
 import com.wenziyue.framework.common.CommonCode;
@@ -29,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenziyue
@@ -154,11 +151,11 @@ public class BizUserServiceImpl implements BizUserService {
                     .or(dto.getPhone() != null, queryWrapper -> queryWrapper.eq(UserEntity::getPhone, phone)));
             if (!userEntityList.isEmpty()) {
                 userEntityList.forEach(userEntity -> {
-                    if (userEntity.getName().equals(dto.getName().trim())) {
+                    if (userEntity.getName().equals(dto.getName().trim()) && !currentUser.getId().equals(userEntity.getId())) {
                         throw new ApiException(BlogResultCode.REGISTER_NAME_EXIST);
-                    } else if (userEntity.getEmail() != null && userEntity.getEmail().equals(email)) {
+                    } else if (userEntity.getEmail() != null && userEntity.getEmail().equals(email) && !currentUser.getId().equals(userEntity.getId())) {
                         throw new ApiException(BlogResultCode.REGISTER_EMAIL_EXIST);
-                    } else if (userEntity.getPhone() != null && userEntity.getPhone().equals(phone)) {
+                    } else if (userEntity.getPhone() != null && userEntity.getPhone().equals(phone) && !currentUser.getId().equals(userEntity.getId())) {
                         throw new ApiException(BlogResultCode.REGISTER_PHONE_EXIST);
                     }
                 });
@@ -170,17 +167,44 @@ public class BizUserServiceImpl implements BizUserService {
             currentUser.setAvatarUrl(dto.getAvatarUrl());
             userService.updateById(currentUser);
 
-            val sMembers = redisUtils.sMembers(RedisConstant.USER_TOKENS_KEY + currentUser.getId());
-            if (sMembers == null || sMembers.isEmpty()) {
-                return;
-            }
-            sMembers.forEach(token -> redisUtils.set(RedisConstant.LOGIN_TOKEN_KEY + token.toString(),  currentUser));
+            // 更新redis中用户信息
+            SecurityUtils.refreshUserInfo(redisUtils, currentUser, objectMapper);
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
             log.error("更新用户信息失败：{}",dto, e);
             throw new ApiException(BlogResultCode.UPDATE_USER_INFO_ERROR);
         }
+    }
+
+    @Override
+    public boolean checkPassword(CheckPasswordDTO dto) {
+        if (dto == null) {
+            throw new ApiException(CommonCode.ILLEGAL_PARAMS);
+        }
+        val userEntity = userService.getById(authHelper.getCurrentUser().getId());
+        if (userEntity == null) {
+            throw new ApiException(BlogResultCode.USER_NOT_EXIST);
+        }
+        return passwordEncoder.matches(dto.getPassword(), userEntity.getPassword());
+    }
+
+    @Override
+    public void updatePassword(UpdatePasswordDTO dto) {
+        if (dto == null) {
+            throw new ApiException(CommonCode.ILLEGAL_PARAMS);
+        }
+        val userEntity = userService.getById(authHelper.getCurrentUser().getId());
+        if (userEntity == null) {
+            throw new ApiException(BlogResultCode.USER_NOT_EXIST);
+        }
+        if (passwordEncoder.matches(dto.getNewPassword(), userEntity.getPassword())) {
+            throw new ApiException(BlogResultCode.OLD_PASSWORD_EQUAL_NEW_PASSWORD);
+        }
+        userEntity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userService.updateById(userEntity);
+        // 更新redis中用户信息
+        SecurityUtils.refreshUserInfo(redisUtils, userEntity, objectMapper);
     }
 
 }

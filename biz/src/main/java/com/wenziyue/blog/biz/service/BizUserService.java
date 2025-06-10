@@ -1,8 +1,6 @@
 package com.wenziyue.blog.biz.service;
 
-import com.wenziyue.blog.dal.dto.RegisterDTO;
-import com.wenziyue.blog.dal.dto.UserInfoDTO;
-import com.wenziyue.blog.dal.dto.UserPageDTO;
+import com.wenziyue.blog.dal.dto.*;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.mybatisplus.page.PageResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,4 +29,10 @@ public interface BizUserService {
 
     @Transactional
     void updateUserInfo(UserInfoDTO dto);
+
+    @Transactional(readOnly = true)
+    boolean checkPassword(CheckPasswordDTO dto);
+
+    @Transactional
+    void updatePassword(UpdatePasswordDTO dto);
 }

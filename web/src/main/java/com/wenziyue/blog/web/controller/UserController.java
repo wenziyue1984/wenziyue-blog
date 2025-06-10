@@ -1,5 +1,7 @@
 package com.wenziyue.blog.web.controller;
 
+import com.wenziyue.blog.dal.dto.CheckPasswordDTO;
+import com.wenziyue.blog.dal.dto.UpdatePasswordDTO;
 import com.wenziyue.blog.dal.dto.UserInfoDTO;
 import com.wenziyue.blog.dal.dto.UserPageDTO;
 import com.wenziyue.blog.biz.service.BizUserService;
@@ -62,7 +64,19 @@ public class UserController {
         bizUserService.updateUserInfo(dto);
     }
 
-    //修改密码 提供旧密码验证后更改新密码功能
+    /**
+     * 改密码时需要先验证旧密码
+     */
+    @Operation(summary = "校验旧密码是否正确", description = "true正确，false错误")
+    @PostMapping("/checkPassword")
+    public boolean checkPassword(@Parameter(description = "校验密码参数", required = true) @Valid @RequestBody CheckPasswordDTO dto) {
+        return bizUserService.checkPassword(dto);
+    }
+    @Operation(summary = "修改密码", description = "修改密码")
+    @PostMapping("/updatePassword")
+    public void updatePassword(@Parameter(description = "修改密码参数", required = true) @Valid @RequestBody UpdatePasswordDTO dto) {
+        bizUserService.updatePassword(dto);
+    }
 
     // TODO 管理后台
 

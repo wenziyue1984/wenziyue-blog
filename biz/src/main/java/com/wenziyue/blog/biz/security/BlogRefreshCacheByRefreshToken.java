@@ -46,8 +46,6 @@ public class BlogRefreshCacheByRefreshToken implements RefreshCacheByRefreshToke
 
             // 删除原缓存
             redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + oldToken);
-            // 维护用户的所有活跃token
-            redisUtils.sRemove(RedisConstant.USER_TOKENS_KEY + userIdFromToken, oldToken);
 
             val userEntity = userService.getById(userIdFromToken);
             if (userEntity == null) {

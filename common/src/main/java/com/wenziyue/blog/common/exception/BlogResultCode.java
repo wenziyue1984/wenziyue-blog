@@ -27,9 +27,11 @@ public enum BlogResultCode implements IResultCode {
     CAPTCHA_HAS_EXPIRED("60100", "验证码已失效"),
     CAPTCHA_IS_ERROR("60100", "验证码错误"),
 
-    REFRESH_TOKEN_ERROR("60110", "验证码错误"),
+    REFRESH_TOKEN_ERROR("60110", "刷新token失败"),
 
     UPDATE_USER_INFO_ERROR("60120", "更新用户信息失败"),
+
+    OLD_PASSWORD_EQUAL_NEW_PASSWORD("60130", "新密码和旧密码相同"),
     ;
 
     private final String code;

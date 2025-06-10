@@ -38,7 +38,7 @@ public class AuthController {
      */
     @Operation(summary = "用户注册", description = "注册成功返回token")
     @PostMapping("/register")
-    public String register(@Parameter(description = "注册参数", required = true) @RequestBody RegisterDTO dto) {
+    public String register(@Parameter(description = "注册参数", required = true) @Valid @RequestBody RegisterDTO dto) {
         return bizUserService.register(dto);
     }
 

@@ -6,6 +6,7 @@ import com.wenziyue.blog.dal.entity.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -20,6 +21,7 @@ public class UserInfoDTO implements Serializable {
     private Long id;
 
     @Schema(description = "用户名（唯一）")
+    @NotBlank
     private String name;
 
     @Schema(description = "头像 URL", requiredMode = Schema.RequiredMode.AUTO)
