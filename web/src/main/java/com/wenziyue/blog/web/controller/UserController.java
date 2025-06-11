@@ -1,11 +1,7 @@
 package com.wenziyue.blog.web.controller;
 
-import com.wenziyue.blog.dal.dto.CheckPasswordDTO;
-import com.wenziyue.blog.dal.dto.UpdatePasswordDTO;
-import com.wenziyue.blog.dal.dto.UserInfoDTO;
-import com.wenziyue.blog.dal.dto.UserPageDTO;
+import com.wenziyue.blog.dal.dto.*;
 import com.wenziyue.blog.biz.service.BizUserService;
-import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.framework.annotation.ResponseResult;
 import com.wenziyue.mybatisplus.page.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,23 +27,7 @@ public class UserController {
 
     private final BizUserService bizUserService;
 
-    @Operation(summary = "用户详情", description = "返回用户信息")
-    @GetMapping("/{id}")
-    public UserEntity testUser(@Parameter(description = "用户id", required = true) @PathVariable("id") Long id) {
-        return bizUserService.queryUserById(id);
-    }
-
-    @Operation(summary = "分页查询用户信息", description = "分页结果")
-    @GetMapping("/page")
-//    @PreAuthorize("hasRole('ADMIN')") // 如果使用 hasRole('ADMIN') 的话需要在security的User.authorities中的authority前加ROLE_前缀：[{"authority": "ROLE_ADMIN"}]
-    @PreAuthorize("hasAuthority('ADMIN')") //security的User.authorities：[{"authority": "ADMIN"}]
-    public PageResult<UserEntity> listProducts(@Parameter(description = "分页请求参数", required = true) UserPageDTO dto) {
-        log.info("dto:{}", dto);
-        return bizUserService.pageUser(dto);
-    }
-
-
-    //todo 用户模块
+    // 用户前台
 
     @Operation(summary = "查看个人信息", description = "返回当前登录用户的昵称、头像、创建时间等")
     @GetMapping("/userInfo")
@@ -72,26 +52,46 @@ public class UserController {
     public boolean checkPassword(@Parameter(description = "校验密码参数", required = true) @Valid @RequestBody CheckPasswordDTO dto) {
         return bizUserService.checkPassword(dto);
     }
+
     @Operation(summary = "修改密码", description = "修改密码")
     @PostMapping("/updatePassword")
     public void updatePassword(@Parameter(description = "修改密码参数", required = true) @Valid @RequestBody UpdatePasswordDTO dto) {
         bizUserService.updatePassword(dto);
     }
 
-    // TODO 管理后台
+    // 管理后台
 
-    //用户分页查询 支持关键词搜索、状态筛选、分页排序
+    @Operation(summary = "分页查询用户信息", description = "支持ID、用户名、邮箱、电话查询")
+    @GetMapping("/page")
+//    @PreAuthorize("hasRole('ADMIN')") // 如果使用 hasRole('ADMIN') 的话需要在security的User.authorities中的authority前加ROLE_前缀：[{"authority": "ROLE_ADMIN"}]
+    @PreAuthorize("hasAuthority('ADMIN')") //security的User.authorities：[{"authority": "ADMIN"}]
+    public PageResult<UserInfoDTO> pageUser(@Parameter(description = "分页请求参数", required = true) @Valid UserPageDTO dto) {
+        log.info("dto:{}", dto);
+        return bizUserService.pageUser(dto);
+    }
 
-    //查看用户详情 查看某个用户的全部资料（含注册时间、最近活跃、文章数等）
+    @Operation(summary = "用户详情", description = "返回用户信息")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public UserInfoDTO userInfo(@Parameter(description = "用户id", required = true) @PathVariable("id") Long id) {
+        return bizUserService.userInfo(id);
+    }
 
-    //禁用/启用用户 修改状态字段（如 status=0 禁用，1 启用）
+    @Operation(summary = "修改用户状态", description = "禁用/启用用户")
+    @PostMapping("changeUserStatus")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void changeUserStatus(@Parameter(description = "修改用户状态参数", required = true) @Valid @RequestBody ChangeUserStatusDTO dto) {
+        bizUserService.changeUserStatus(dto);
+    }
 
-    //逻辑删除用户 不物理删除，仅做状态标记
+    @Operation(summary = "重置密码", description = "重置密码")
+    @PostMapping("resetPassword/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void resetPassword(@Parameter(description = "重置密码参数", required = true) @Valid @RequestBody UpdatePasswordDTO dto
+            , @Parameter(description = "用户id", required = true) @PathVariable Long id) {
+        bizUserService.resetPassword(dto, id);
+    }
 
-    //重置密码 设置新密码（管理员重置）
-
-    //后台添加用户 管理员可新建用户账号
-
-    //导出用户列表 可选功能，生成 Excel 下载（后续做）
+    //todo: 导出用户列表 可选功能，生成 Excel 下载（后续做）
 
 }

@@ -6,7 +6,7 @@ import com.wenziyue.blog.biz.security.AuthHelper;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.biz.utils.IdUtils;
 import com.wenziyue.blog.biz.utils.SecurityUtils;
-import com.wenziyue.blog.common.constants.RedisConstant;
+import com.wenziyue.blog.common.enums.UserStatusEnum;
 import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.common.utils.BlogUtils;
 import com.wenziyue.blog.dal.dto.*;
@@ -14,6 +14,8 @@ import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.blog.dal.service.UserService;
 import com.wenziyue.framework.common.CommonCode;
 import com.wenziyue.framework.exception.ApiException;
+import com.wenziyue.framework.utils.EnumUtils;
+import com.wenziyue.idempotent.annotation.WenziyueIdempotent;
 import com.wenziyue.mybatisplus.page.PageResult;
 import com.wenziyue.redis.utils.RedisUtils;
 import com.wenziyue.security.utils.JwtUtils;
@@ -48,26 +50,23 @@ public class BizUserServiceImpl implements BizUserService {
     private long expire;
 
     @Override
-    public List<UserEntity> queryUserList() {
-        return userService.list();
-    }
-
-    @Override
-    public UserEntity queryUserById(Long id) {
+    public UserInfoDTO userInfo(Long id) {
         val po = userService.getById(id);
         if (po == null) {
-            throw new ApiException("800", "无此用户");
+            throw new ApiException(BlogResultCode.USER_NOT_EXIST);
         }
-        return po;
+        return new UserInfoDTO(po);
     }
 
     @Override
-    public PageResult<UserEntity> pageUser(UserPageDTO dto) {
+    public PageResult<UserInfoDTO> pageUser(UserPageDTO dto) {
         return userService.page(dto, Wrappers.<UserEntity>lambdaQuery()
-                .eq(dto.getId() != null, UserEntity::getId, dto.getId())
-                .like(dto.getName() != null, UserEntity::getName, dto.getName())
-                .like(dto.getEmail() != null, UserEntity::getEmail, dto.getEmail())
-                .orderByDesc(UserEntity::getUpdateTime));
+                        .eq(dto.getId() != null, UserEntity::getId, dto.getId())
+                        .like(BlogUtils.safeTrimEmptyIsNull(dto.getName()) != null, UserEntity::getName, dto.getName())
+                        .like(BlogUtils.safeTrimEmptyIsNull(dto.getEmail()) != null, UserEntity::getEmail, dto.getEmail())
+                        .like(BlogUtils.safeTrimEmptyIsNull(dto.getPhone()) != null, UserEntity::getPhone, dto.getPhone())
+                        .orderByDesc(UserEntity::getUpdateTime))
+                .map(UserInfoDTO::new);
     }
 
     @Override
@@ -129,11 +128,12 @@ public class BizUserServiceImpl implements BizUserService {
     }
 
     @Override
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "updateUserInfo", timeout = 60)
     public void updateUserInfo(UserInfoDTO dto) {
         if (dto == null) {
             throw new ApiException(CommonCode.ILLEGAL_PARAMS);
         }
-        if (dto.getName() == null  || dto.getName().trim().isEmpty()) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
             throw new ApiException(BlogResultCode.REGISTER_PARAM_ERROR);
         }
         val currentUser = authHelper.getCurrentUser();
@@ -172,7 +172,7 @@ public class BizUserServiceImpl implements BizUserService {
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
-            log.error("更新用户信息失败：{}",dto, e);
+            log.error("更新用户信息失败：{}", dto, e);
             throw new ApiException(BlogResultCode.UPDATE_USER_INFO_ERROR);
         }
     }
@@ -190,6 +190,7 @@ public class BizUserServiceImpl implements BizUserService {
     }
 
     @Override
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "updatePassword", timeout = 60)
     public void updatePassword(UpdatePasswordDTO dto) {
         if (dto == null) {
             throw new ApiException(CommonCode.ILLEGAL_PARAMS);
@@ -205,6 +206,46 @@ public class BizUserServiceImpl implements BizUserService {
         userService.updateById(userEntity);
         // 更新redis中用户信息
         SecurityUtils.refreshUserInfo(redisUtils, userEntity, objectMapper);
+    }
+
+    @Override
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "changeUserStatus", timeout = 60)
+    public void changeUserStatus(ChangeUserStatusDTO dto) {
+        if (dto == null || dto.getId() == null || dto.getStatus() == null) {
+            throw new ApiException(CommonCode.ILLEGAL_PARAMS);
+        }
+        // 如果dto.getStatus()对应的code不在UserStatusEnum中，那么抛出异常
+        val userStatusEnum = EnumUtils.fromCode(UserStatusEnum.class, dto.getStatus());
+
+        val userEntity = userService.getById(dto.getId());
+        if (userEntity == null) {
+            throw new ApiException(BlogResultCode.USER_NOT_EXIST);
+        }
+        if (!userEntity.getStatus().equals(userStatusEnum)) {
+            userEntity.setStatus(userStatusEnum);
+            userService.updateById(userEntity);
+        }
+        // 更新redis中用户信息
+        SecurityUtils.refreshUserInfo(redisUtils, userEntity, objectMapper);
+    }
+
+    @Override
+    @WenziyueIdempotent(keys = {"#id"}, prefix = "resetPassword", timeout = 60)
+    public void resetPassword(UpdatePasswordDTO dto, Long id) {
+        if (dto == null || dto.getNewPassword() == null || dto.getNewPassword().isEmpty()) {
+            throw new ApiException(CommonCode.ILLEGAL_PARAMS);
+        }
+        val userEntity = userService.getById(id);
+        if (userEntity == null) {
+            throw new ApiException(BlogResultCode.USER_NOT_EXIST);
+        }
+        if (passwordEncoder.matches(userEntity.getPassword(), userEntity.getPassword())) {
+            return;
+        }
+        userEntity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userService.updateById(userEntity);
+        // 重设密码后需要重新登录，因此删除用户所有登录token
+        SecurityUtils.clearUserAllToken(redisUtils, userEntity.getId(), objectMapper);
     }
 
 }

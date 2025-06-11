@@ -98,4 +98,20 @@ public class SecurityUtils {
         });
     }
 
+    /**
+     * 清除用户所有登录token
+     */
+    public static void clearUserAllToken(RedisUtils redisUtils, Long userId, ObjectMapper objectMapper) {
+        String key = RedisConstant.USER_TOKENS_KEY + userId;
+        val sMembers = redisUtils.sMembers(key);
+        if (sMembers == null || sMembers.isEmpty()) {
+            return;
+        }
+        sMembers.forEach(dto -> {
+            val tokenExpireDTO = objectMapper.convertValue(dto, TokenExpireDTO.class);
+            redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + tokenExpireDTO.getToken());
+        });
+        redisUtils.delete(key);
+    }
+
 }

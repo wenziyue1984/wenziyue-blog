@@ -13,13 +13,10 @@ import java.util.List;
 public interface BizUserService {
 
     @Transactional(readOnly = true)
-    List<UserEntity> queryUserList();
+    UserInfoDTO userInfo(Long id);
 
     @Transactional(readOnly = true)
-    UserEntity queryUserById(Long id);
-
-    @Transactional(readOnly = true)
-    PageResult<UserEntity> pageUser(UserPageDTO dto);
+    PageResult<UserInfoDTO> pageUser(UserPageDTO dto);
 
     @Transactional
     String register(RegisterDTO dto);
@@ -35,4 +32,10 @@ public interface BizUserService {
 
     @Transactional
     void updatePassword(UpdatePasswordDTO dto);
+
+    @Transactional
+    void changeUserStatus(ChangeUserStatusDTO dto);
+
+    @Transactional
+    void resetPassword(UpdatePasswordDTO dto, Long id);
 }

@@ -23,12 +23,16 @@ public class UserPageDTO extends PageRequest {
     @Schema(description = "邮箱", example = "example@xxx.com")
     private String email;
 
+    @Schema(description = "电话", example = "13000000000")
+    private String phone;
+
     @Override
     public String toString() {
         return "UserPageDTO{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
                 ", size='" + getSize() + '\'' +
                 ", current='" + getCurrent() + '\'' +
                 '}';
