@@ -4,7 +4,7 @@
 
     <!-- 从配置中读取变量 -->
     <springProperty name="APP_NAME" source="spring.application.name" defaultValue="wenziyue-blog"/>
-    <springProperty name="LOG_PATH" source="logging.file.path" defaultValue="./logs"/>
+    <springProperty name="LOG_PATH" source="logging.file.path" defaultValue="./.logs"/>
     <springProperty name="LOG_MAXFILESIZE" source="logback.filesize" defaultValue="50MB"/>
     <springProperty name="LOG_FILEMAXDAY" source="logback.filemaxday" defaultValue="7"/>
     <springProperty name="ServerIP" source="spring.cloud.client.ip-address" defaultValue="0.0.0.0"/>

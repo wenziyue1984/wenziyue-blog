@@ -103,7 +103,7 @@ logging:
   level:
     root: INFO
   file:
-    path: ./logs
+    path: ./.logs
 
 
 logback:

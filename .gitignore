@@ -50,3 +50,7 @@ build/
 # 环境变量
 .env
 .env.*
+
+# 不需要上传的文件
+/.deploy
+/.logs
