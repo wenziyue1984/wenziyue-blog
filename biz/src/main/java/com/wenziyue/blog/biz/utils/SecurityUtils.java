@@ -23,7 +23,7 @@ public class SecurityUtils {
      * 用户信息存入redis
      */
     public static void saveUserInfoInRedis(RedisUtils redisUtils, UserEntity userEntity, String token, Long expire) {
-        redisUtils.set(RedisConstant.LOGIN_TOKEN_KEY + token, userEntity, expire, TimeUnit.MILLISECONDS);
+        redisUtils.set(RedisConstant.LOGIN_TOKEN_KEY + token, userEntity, expire, TimeUnit.SECONDS);
     }
 
     public static String getTokenFromRequest(HttpServletRequest request, String tokenHeader, String tokenPrefix) {
@@ -40,8 +40,8 @@ public class SecurityUtils {
      */
     public static void refreshAndAddUserActiveTokenSet(RedisUtils redisUtils, String newToken, String oldToken, Long expire, Long userId, ObjectMapper objectMapper) {
         refreshUserActiveTokenSet(redisUtils, userId, oldToken, objectMapper);
-        val tokenExpireDTO = TokenExpireDTO.builder().token(newToken).expireTimeStamp(System.currentTimeMillis() + expire).build();
-        redisUtils.sAddAndExpire(RedisConstant.USER_TOKENS_KEY + userId, expire, TimeUnit.MILLISECONDS, tokenExpireDTO);
+        val tokenExpireDTO = TokenExpireDTO.builder().token(newToken).expireTimeStamp(System.currentTimeMillis() + (expire * 1000)).build();
+        redisUtils.sAddAndExpire(RedisConstant.USER_TOKENS_KEY + userId, expire, TimeUnit.SECONDS, tokenExpireDTO);
     }
 
     /**

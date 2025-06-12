@@ -1,11 +1,8 @@
 package com.wenziyue.blog.biz.service;
 
 import com.wenziyue.blog.dal.dto.*;
-import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.mybatisplus.page.PageResult;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * @author wenziyue

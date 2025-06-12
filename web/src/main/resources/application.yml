@@ -59,10 +59,10 @@ wenziyue:
     token-header: Authorization
     token-prefix: Bearer
     refresh-token-header: X-Refresh-Token  # 刷新token时返回的header头
-    expire: 604800000 # token过期时间，默认7天，单位毫秒
-    refresh-before-expiration: 86400000  # 刷新token时间，默认1天，单位毫秒
-#    expire: 120000 # token过期时间，测试两分钟
-#    refresh-before-expiration: 60000  # 刷新token时间，测试一分钟
+    expire: 604800 # token过期时间，默认7天，单位秒
+    refresh-before-expiration: 86400  # 刷新token时间，默认1天，单位秒
+#    expire: 120 # token过期时间，测试两分钟
+#    refresh-before-expiration: 60  # 刷新token时间，测试一分钟
     jwt-secret: ${JWT_SECRET:jwt-secret}
     white-list:
       - "/test/**"

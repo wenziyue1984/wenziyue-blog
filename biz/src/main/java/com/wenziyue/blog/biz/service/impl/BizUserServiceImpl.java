@@ -239,7 +239,7 @@ public class BizUserServiceImpl implements BizUserService {
         if (userEntity == null) {
             throw new ApiException(BlogResultCode.USER_NOT_EXIST);
         }
-        if (passwordEncoder.matches(userEntity.getPassword(), userEntity.getPassword())) {
+        if (passwordEncoder.matches(dto.getNewPassword(), userEntity.getPassword())) {
             return;
         }
         userEntity.setPassword(passwordEncoder.encode(dto.getNewPassword()));

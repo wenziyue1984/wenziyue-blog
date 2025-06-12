@@ -4,9 +4,6 @@ import com.wenziyue.blog.dal.entity.UserEntity;
 import lombok.Getter;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.Collections;
-
-
 /**
  * 自定义UserDetails，携带UserEntity信息
  *

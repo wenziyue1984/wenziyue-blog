@@ -66,19 +66,19 @@ public class BizAuthServiceImpl implements BizAuthService {
             throw new ApiException(BlogResultCode.LOGIN_PARAM_IS_EMPTY);
         }
         // 校验验证码
-        if (dto.getCaptchaCode() == null || dto.getCaptchaCode().isEmpty()
-                || dto.getCaptchaUuid() == null || dto.getCaptchaUuid().isEmpty()) {
-            throw new ApiException(BlogResultCode.CAPTCHA_IS_EMPTY);
-        }
-        val captcha = redisUtils.get(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid(), String.class);
-        if (captcha == null) {
-            throw new ApiException(BlogResultCode.CAPTCHA_HAS_EXPIRED);
-        }
-        if (!dto.getCaptchaCode().equals(captcha)) {
-            throw new ApiException(BlogResultCode.CAPTCHA_IS_ERROR);
-        }
-        // 删除校验通过的验证码
-        redisUtils.delete(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid());
+//        if (dto.getCaptchaCode() == null || dto.getCaptchaCode().isEmpty()
+//                || dto.getCaptchaUuid() == null || dto.getCaptchaUuid().isEmpty()) {
+//            throw new ApiException(BlogResultCode.CAPTCHA_IS_EMPTY);
+//        }
+//        val captcha = redisUtils.get(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid(), String.class);
+//        if (captcha == null) {
+//            throw new ApiException(BlogResultCode.CAPTCHA_HAS_EXPIRED);
+//        }
+//        if (!dto.getCaptchaCode().equals(captcha)) {
+//            throw new ApiException(BlogResultCode.CAPTCHA_IS_ERROR);
+//        }
+//        // 删除校验通过的验证码
+//        redisUtils.delete(RedisConstant.CAPTCHA_KEY + dto.getCaptchaUuid());
 
         // 校验登录信息
         if (dto.getName() == null || dto.getName().isEmpty()
