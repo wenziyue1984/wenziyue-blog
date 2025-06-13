@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -54,8 +55,8 @@ public class BlogUserDetailsServiceByIdOrToken implements UserDetailsServiceById
             throw new JwtException("token已失效");
         }
         // 角色权限(简易版本，如有需要可扩充)
-        List<GrantedAuthority> authorities = Collections.singletonList((GrantedAuthority) () ->
-                userEntity.getRole().equals(UserRoleEnum.ADMIN) ?  UserRoleEnum.ADMIN.getRole() : UserRoleEnum.USER.getRole());
+        List<GrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority(userEntity.getRole().equals(UserRoleEnum.ADMIN) ? UserRoleEnum.ADMIN.getRole() : UserRoleEnum.USER.getRole()));
         User user = new User(userEntity.getName(), userEntity.getPassword() == null ? "" : userEntity.getPassword()
                 , true, true, true
                 , userEntity.getStatus().equals(UserStatusEnum.ENABLED), authorities);
@@ -64,6 +65,7 @@ public class BlogUserDetailsServiceByIdOrToken implements UserDetailsServiceById
 
     /**
      * 检查sMembers中是否有该token，并且token没有过期
+     *
      * @return true:token有效，false:token无效
      */
     private boolean checkTokenIsActive(Set<Object> sMembers, String token) {

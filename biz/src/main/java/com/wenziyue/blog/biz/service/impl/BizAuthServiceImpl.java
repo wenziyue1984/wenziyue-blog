@@ -48,7 +48,7 @@ public class BizAuthServiceImpl implements BizAuthService {
     private final RedisUtils redisUtils;
     private final ThirdOauthService thirdOauthService;
     private final IdGen idGen;
-    private final ObjectMapper objectMapper;
+    private final SecurityUtils securityUtils;
 
     @Value("${wenziyue.security.expire}")
     private Long expire;
@@ -99,7 +99,7 @@ public class BizAuthServiceImpl implements BizAuthService {
         val token = jwtUtils.generateToken(userEntity.getId().toString());
 
         // 将用户信息存入redis && 维护用户的所有活跃token
-        SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, token, null, expire, objectMapper);
+        securityUtils.userInfoSaveInRedisAndRefreshUserToken( userEntity, token, null, expire);
 
         return token;
     }
@@ -159,7 +159,7 @@ public class BizAuthServiceImpl implements BizAuthService {
             val token = jwtUtils.generateToken(userEntity.getId().toString());
 
             // 5. 缓存用户信息 + 维护活跃集合
-            SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, token, null, expire, objectMapper);
+            securityUtils.userInfoSaveInRedisAndRefreshUserToken( userEntity, token, null, expire);
             return token;
         } catch (Exception e) {
             log.error("google登录异常", e);
@@ -172,16 +172,16 @@ public class BizAuthServiceImpl implements BizAuthService {
      */
     @Override
     public boolean logout(HttpServletRequest request) {
-        String token = SecurityUtils.getTokenFromRequest(request, tokenHeader, tokenPrefix);
+        String token = securityUtils.getTokenFromRequest(request, tokenHeader, tokenPrefix);
         if (token == null) {
             return false;
         }
-        // 删除redis中的用户信息
-        redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + token);
-        // 解析用户id
         val userIdFromToken = jwtUtils.getUserIdFromToken(token);
-        // 维护用户的所有活跃token
-        redisUtils.sRemove(RedisConstant.USER_TOKENS_KEY + userIdFromToken, token);
+        if (userIdFromToken == null || userIdFromToken.isEmpty()) {
+            throw new RuntimeException("token解析失败:" + token);
+        }
+        // 删除redis中的用户信息 && 维护用户的所有活跃token
+        securityUtils.deleteTokenAndRefreshActiveTokenSet(token, Long.valueOf(userIdFromToken));
         return true;
     }
 

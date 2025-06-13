@@ -5,10 +5,15 @@ import com.wenziyue.blog.biz.security.TokenExpireDTO;
 import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.dal.entity.UserEntity;
 import com.wenziyue.redis.utils.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -17,16 +22,23 @@ import java.util.concurrent.TimeUnit;
  * @author wenziyue
  */
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class SecurityUtils {
+
+    private final RedisUtils redisUtils;
+    private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisScript<Long> clearAllTokensScript;
 
     /**
      * 用户信息存入redis
      */
-    public static void saveUserInfoInRedis(RedisUtils redisUtils, UserEntity userEntity, String token, Long expire) {
+    public void saveUserInfoInRedis(UserEntity userEntity, String token, Long expire) {
         redisUtils.set(RedisConstant.LOGIN_TOKEN_KEY + token, userEntity, expire, TimeUnit.SECONDS);
     }
 
-    public static String getTokenFromRequest(HttpServletRequest request, String tokenHeader, String tokenPrefix) {
+    public String getTokenFromRequest(HttpServletRequest request, String tokenHeader, String tokenPrefix) {
         String authorization = request.getHeader(tokenHeader);
         if (authorization == null || !authorization.startsWith(tokenPrefix) || authorization.length() <= tokenPrefix.length() + 1) {
             log.warn("无效token:{}", authorization);
@@ -38,8 +50,8 @@ public class SecurityUtils {
     /**
      * 维护活跃的token集合
      */
-    public static void refreshAndAddUserActiveTokenSet(RedisUtils redisUtils, String newToken, String oldToken, Long expire, Long userId, ObjectMapper objectMapper) {
-        refreshUserActiveTokenSet(redisUtils, userId, oldToken, objectMapper);
+    public void refreshAndAddUserActiveTokenSet(String newToken, String oldToken, Long expire, Long userId) {
+        refreshUserActiveTokenSet(userId, oldToken);
         val tokenExpireDTO = TokenExpireDTO.builder().token(newToken).expireTimeStamp(System.currentTimeMillis() + (expire * 1000)).build();
         redisUtils.sAddAndExpire(RedisConstant.USER_TOKENS_KEY + userId, expire, TimeUnit.SECONDS, tokenExpireDTO);
     }
@@ -49,10 +61,10 @@ public class SecurityUtils {
      *
      * @return 返回刷新后的活跃token集合
      */
-    public static Set<Object> refreshUserActiveTokenSet(RedisUtils redisUtils, Long userId, String oldToken, ObjectMapper objectMapper) {
+    public Set<Object> refreshUserActiveTokenSet(Long userId, String oldToken) {
         val sMembers = redisUtils.sMembers(RedisConstant.USER_TOKENS_KEY + userId);
         if (sMembers == null || sMembers.isEmpty()) {
-            return null;
+            return Collections.emptySet();
         }
 
         Set<Object> result = new HashSet<>();
@@ -72,17 +84,17 @@ public class SecurityUtils {
     /**
      * 用户信息存入redis，并且维护用户的活跃token
      */
-    public static void userInfoSaveInRedisAndRefreshUserToken(RedisUtils redisUtils, UserEntity userEntity, String newToken, String oldToken, Long expire, ObjectMapper objectMapper) {
-        saveUserInfoInRedis(redisUtils, userEntity, newToken, expire);
-        refreshAndAddUserActiveTokenSet(redisUtils, newToken, oldToken, expire, userEntity.getId(), objectMapper);
+    public void userInfoSaveInRedisAndRefreshUserToken(UserEntity userEntity, String newToken, String oldToken, Long expire) {
+        saveUserInfoInRedis(userEntity, newToken, expire);
+        refreshAndAddUserActiveTokenSet(newToken, oldToken, expire, userEntity.getId());
     }
 
     /**
      * 修改用户信息后同步redis中保存的用户信息
      */
-    public static void refreshUserInfo(RedisUtils redisUtils, UserEntity userEntity, ObjectMapper objectMapper) {
-        val sMembers = refreshUserActiveTokenSet(redisUtils, userEntity.getId(), null, objectMapper);
-        if (sMembers == null || sMembers.isEmpty()) {
+    public void refreshUserInfo(UserEntity userEntity) {
+        val sMembers = refreshUserActiveTokenSet(userEntity.getId(), null);
+        if (sMembers.isEmpty()) {
             return;
         }
         sMembers.forEach(dto -> {
@@ -99,19 +111,27 @@ public class SecurityUtils {
     }
 
     /**
-     * 清除用户所有登录token
+     * 清除用户所有登录token，使用lua脚本原子化执行
      */
-    public static void clearUserAllToken(RedisUtils redisUtils, Long userId, ObjectMapper objectMapper) {
-        String key = RedisConstant.USER_TOKENS_KEY + userId;
-        val sMembers = redisUtils.sMembers(key);
-        if (sMembers == null || sMembers.isEmpty()) {
-            return;
-        }
-        sMembers.forEach(dto -> {
-            val tokenExpireDTO = objectMapper.convertValue(dto, TokenExpireDTO.class);
-            redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + tokenExpireDTO.getToken());
-        });
-        redisUtils.delete(key);
+    public void clearUserAllToken(Long userId) {
+        String setKey = RedisConstant.USER_TOKENS_KEY + userId;
+        String prefix = RedisConstant.LOGIN_TOKEN_KEY; // 确保末尾带冒号
+        // 执行 Lua，一次性删 token 缓存和集合
+        val count = redisTemplate.execute(
+                clearAllTokensScript,
+                Collections.singletonList(setKey),
+                prefix
+        );
+    }
+
+    /**
+     * 删除token，并刷新用户活跃token集合
+     */
+    public void deleteTokenAndRefreshActiveTokenSet(String token, Long userId) {
+        // 删除token
+        redisUtils.delete(RedisConstant.LOGIN_TOKEN_KEY + token);
+        // 维护用户的所有活跃token
+        refreshUserActiveTokenSet(userId, token);
     }
 
 }

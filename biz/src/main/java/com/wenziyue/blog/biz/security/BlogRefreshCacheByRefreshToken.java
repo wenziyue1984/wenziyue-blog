@@ -29,7 +29,7 @@ public class BlogRefreshCacheByRefreshToken implements RefreshCacheByRefreshToke
     private final RedisUtils redisUtils;
     private final JwtUtils jwtUtils;
     private final UserService userService;
-    private final ObjectMapper objectMapper;
+    private final SecurityUtils securityUtils;
 
     @Value("${wenziyue.security.expire}")
     private Long expire;
@@ -54,7 +54,7 @@ public class BlogRefreshCacheByRefreshToken implements RefreshCacheByRefreshToke
             }
 
             // 将用户信息存入redis && 维护用户的所有活跃token
-            SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, newToken, oldToken, expire, objectMapper);
+            securityUtils.userInfoSaveInRedisAndRefreshUserToken(userEntity, newToken, oldToken, expire);
         } catch (JwtException | ApiException e) {
             throw e;
         } catch (Exception e) {

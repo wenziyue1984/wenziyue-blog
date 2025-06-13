@@ -1,7 +1,6 @@
 package com.wenziyue.blog.biz.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wenziyue.blog.biz.security.AuthHelper;
 import com.wenziyue.blog.biz.service.BizUserService;
 import com.wenziyue.blog.biz.utils.IdUtils;
@@ -17,7 +16,6 @@ import com.wenziyue.framework.exception.ApiException;
 import com.wenziyue.framework.utils.EnumUtils;
 import com.wenziyue.idempotent.annotation.WenziyueIdempotent;
 import com.wenziyue.mybatisplus.page.PageResult;
-import com.wenziyue.redis.utils.RedisUtils;
 import com.wenziyue.security.utils.JwtUtils;
 import com.wenziyue.uid.core.IdGen;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 /**
  * @author wenziyue
@@ -39,12 +36,11 @@ import java.util.List;
 public class BizUserServiceImpl implements BizUserService {
 
     private final UserService userService;
-    private final RedisUtils redisUtils;
     private final IdGen idGen;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final AuthHelper authHelper;
-    private final ObjectMapper objectMapper;
+    private final SecurityUtils securityUtils;
 
     @Value("${wenziyue.security.expire}")
     private long expire;
@@ -111,7 +107,7 @@ public class BizUserServiceImpl implements BizUserService {
 
             // 生成token返回 && 维护活跃token列表
             val token = jwtUtils.generateToken(userEntity.getId().toString());
-            SecurityUtils.userInfoSaveInRedisAndRefreshUserToken(redisUtils, userEntity, token, null, expire, objectMapper);
+            securityUtils.userInfoSaveInRedisAndRefreshUserToken(userEntity, token, null, expire);
             return token;
         } catch (ApiException e) {
             throw e;
@@ -128,7 +124,7 @@ public class BizUserServiceImpl implements BizUserService {
     }
 
     @Override
-    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "updateUserInfo", timeout = 60)
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "blog:updateUserInfo", timeout = 60)
     public void updateUserInfo(UserInfoDTO dto) {
         if (dto == null) {
             throw new ApiException(CommonCode.ILLEGAL_PARAMS);
@@ -168,7 +164,7 @@ public class BizUserServiceImpl implements BizUserService {
             userService.updateById(currentUser);
 
             // 更新redis中用户信息
-            SecurityUtils.refreshUserInfo(redisUtils, currentUser, objectMapper);
+            securityUtils.refreshUserInfo(currentUser);
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
@@ -190,7 +186,7 @@ public class BizUserServiceImpl implements BizUserService {
     }
 
     @Override
-    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "updatePassword", timeout = 60)
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "blog:updatePassword", timeout = 60, cleanOnFinish = false, cleanOnError = true)
     public void updatePassword(UpdatePasswordDTO dto) {
         if (dto == null) {
             throw new ApiException(CommonCode.ILLEGAL_PARAMS);
@@ -204,12 +200,12 @@ public class BizUserServiceImpl implements BizUserService {
         }
         userEntity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userService.updateById(userEntity);
-        // 更新redis中用户信息
-        SecurityUtils.refreshUserInfo(redisUtils, userEntity, objectMapper);
+        // 重设密码后需要重新登录，因此删除用户所有登录token
+        securityUtils.clearUserAllToken(userEntity.getId());
     }
 
     @Override
-    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "changeUserStatus", timeout = 60)
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "blog:changeUserStatus", timeout = 60)
     public void changeUserStatus(ChangeUserStatusDTO dto) {
         if (dto == null || dto.getId() == null || dto.getStatus() == null) {
             throw new ApiException(CommonCode.ILLEGAL_PARAMS);
@@ -226,16 +222,16 @@ public class BizUserServiceImpl implements BizUserService {
             userService.updateById(userEntity);
         }
         // 更新redis中用户信息
-        SecurityUtils.refreshUserInfo(redisUtils, userEntity, objectMapper);
+        securityUtils.refreshUserInfo(userEntity);
     }
 
     @Override
-    @WenziyueIdempotent(keys = {"#id"}, prefix = "resetPassword", timeout = 60)
-    public void resetPassword(UpdatePasswordDTO dto, Long id) {
+    @WenziyueIdempotent(keys = {"#dto.id"}, prefix = "blog:resetPassword", timeout = 60)
+    public void resetPassword(UpdatePasswordDTO dto) {
         if (dto == null || dto.getNewPassword() == null || dto.getNewPassword().isEmpty()) {
             throw new ApiException(CommonCode.ILLEGAL_PARAMS);
         }
-        val userEntity = userService.getById(id);
+        val userEntity = userService.getById(dto.getId());
         if (userEntity == null) {
             throw new ApiException(BlogResultCode.USER_NOT_EXIST);
         }
@@ -245,7 +241,7 @@ public class BizUserServiceImpl implements BizUserService {
         userEntity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userService.updateById(userEntity);
         // 重设密码后需要重新登录，因此删除用户所有登录token
-        SecurityUtils.clearUserAllToken(redisUtils, userEntity.getId(), objectMapper);
+        securityUtils.clearUserAllToken(userEntity.getId());
     }
 
 }

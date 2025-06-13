@@ -34,5 +34,5 @@ public interface BizUserService {
     void changeUserStatus(ChangeUserStatusDTO dto);
 
     @Transactional
-    void resetPassword(UpdatePasswordDTO dto, Long id);
+    void resetPassword(UpdatePasswordDTO dto);
 }

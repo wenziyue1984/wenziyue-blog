@@ -87,9 +87,8 @@ public class UserController {
     @Operation(summary = "重置密码", description = "重置密码")
     @PostMapping("resetPassword/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void resetPassword(@Parameter(description = "重置密码参数", required = true) @Valid @RequestBody UpdatePasswordDTO dto
-            , @Parameter(description = "用户id", required = true) @PathVariable Long id) {
-        bizUserService.resetPassword(dto, id);
+    public void resetPassword(@Parameter(description = "重置密码参数", required = true) @Valid @RequestBody UpdatePasswordDTO dto) {
+        bizUserService.resetPassword(dto);
     }
 
     //todo: 导出用户列表 可选功能，生成 Excel 下载（后续做）

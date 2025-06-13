@@ -19,6 +19,4 @@ public enum UserRoleEnum implements ICommonEnum {
     private final Integer code;
     private final String desc;
     private final String role;
-
-
 }

@@ -95,7 +95,7 @@ public class TestController {
      * 测试幂等注解
      */
     @GetMapping("/testIdempotent/{id}")
-    @WenziyueIdempotent(keys = {"#id"}, prefix = "idempotentTest", timeout = 60)
+    @WenziyueIdempotent(keys = {"#id"}, prefix = "blog:idempotentTest", timeout = 60)
     public void testIdempotent(@PathVariable String id) {
         log.info("idempotentTest:{}", id);
     }

@@ -81,7 +81,6 @@ wenziyue:
   idempotent:
     enabled: true          # 是否启用（默认 true）
     default-timeout: 60    # 默认过期秒数，默认60s
-    clean-on-error: false   # 业务异常时是否删除 Redis key
   # wenziyue-swagger-starter
   swagger:
     active-profiles: dev,test
