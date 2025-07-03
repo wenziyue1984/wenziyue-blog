@@ -7,6 +7,9 @@ logging:
     com.wzy: DEBUG # 根日志级别
     com.baomidou.mybatisplus.extension.handlers: DEBUG
 
+rocketmq:
+  name-server: ${ROCKET_MQ_SERVER_DEV}
+
 wenziyue:
   # wenziyue-uid-starter
   uid:
@@ -14,7 +17,7 @@ wenziyue:
     prepare-next-percent: 70
   # wenziyue-security-starter
   security:
-    expire: 240 # token过期时间，测试4分钟
+    expire: 1800 # token过期时间，测试30分钟
     refresh-before-expiration: 120  # 刷新token时间，测试2分钟
     white-list:
       - "/test/**"

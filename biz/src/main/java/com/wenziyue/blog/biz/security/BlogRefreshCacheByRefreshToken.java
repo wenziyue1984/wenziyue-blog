@@ -1,6 +1,5 @@
 package com.wenziyue.blog.biz.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wenziyue.blog.biz.utils.SecurityUtils;
 import com.wenziyue.blog.common.constants.RedisConstant;
 import com.wenziyue.blog.common.exception.BlogResultCode;

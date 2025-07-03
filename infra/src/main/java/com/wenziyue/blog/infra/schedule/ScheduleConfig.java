@@ -21,7 +21,6 @@ public class ScheduleConfig implements SchedulingConfigurer {
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar registrar) {
-        // 创建调度线程池（注意不是 ThreadPoolTaskExecutor）
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2, runnable -> {
             Runnable decorated = mdcTaskDecorator.decorate(runnable);
             Thread thread = new Thread(decorated);

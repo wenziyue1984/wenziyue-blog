@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
+ * 权限接口
+ *
  * @author wenziyue
  */
 @RestController

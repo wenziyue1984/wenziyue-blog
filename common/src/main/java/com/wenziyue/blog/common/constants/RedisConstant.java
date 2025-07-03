@@ -21,4 +21,14 @@ public interface RedisConstant {
      * 验证码
      */
     String CAPTCHA_KEY = "blog:captcha:";
+
+    /**
+     * 监听生成的slug
+     */
+    String SLUG_LISTEN_KEY = "blog:slug:listen:";
+
+    /**
+     * 文章版本，防止生成summary和slug的时候文章已被修改，也可验证当前文章有无加入mq队列
+     */
+    String ARTICLE_VERSION_KEY = "blog:article:version:";
 }

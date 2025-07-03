@@ -32,6 +32,13 @@ public enum BlogResultCode implements IResultCode {
     UPDATE_USER_INFO_ERROR("60120", "更新用户信息失败"),
 
     OLD_PASSWORD_EQUAL_NEW_PASSWORD("60130", "新密码和旧密码相同"),
+
+    SLUG_GENERATE_ERROR("60140", "slug生成失败"),
+
+    ARTICLE_TITLE_EMPTY("60150", "文章标题为空"),
+    ARTICLE_CONTENT_EMPTY("60160", "文章内容为空"),
+    ARTICLE_SAVE_ERROR("60170", "文章保存失败"),
+    ARTICLE_TITLE_REPEAT("60180", "文章标题重复"),
     ;
 
     private final String code;

@@ -47,7 +47,14 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true #驼峰命名
   mapper-locations: classpath*:mapper/*.xml
-  type-aliases-package: com.wzy.dal.po
+  type-aliases-package: com.wenziyue.blog.dal.entity
+
+
+rocketmq:
+  name-server: ${ROCKET_MQ_SERVER}
+  producer:
+    send-message-timeout: 10000 # 默认是 3000 毫秒
+    group: default-producer
 
 
 wenziyue:

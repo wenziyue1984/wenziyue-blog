@@ -17,6 +17,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 验证码接口
+ *
  * @author wenziyue
  */
 @RestController

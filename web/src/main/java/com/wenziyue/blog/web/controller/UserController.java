@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
+ * 用户相关接口
+ *
  * @author wenziyue
  */
 @RestController

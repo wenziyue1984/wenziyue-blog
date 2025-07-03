@@ -4,9 +4,11 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.wenziyue.blog.biz.security.BlogUserDetails;
 import com.wenziyue.blog.biz.service.impl.AsyncService;
 import com.wenziyue.blog.common.enums.ThirdOauthProviderEnum;
+import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.dal.entity.ThirdOauthEntity;
 import com.wenziyue.blog.dal.service.ThirdOauthService;
 import com.wenziyue.framework.annotation.ResponseResult;
+import com.wenziyue.framework.exception.ApiException;
 import com.wenziyue.framework.trace.MdcExecutors;
 import com.wenziyue.framework.trace.MdcTaskDecorator;
 import com.wenziyue.idempotent.annotation.WenziyueIdempotent;
@@ -15,6 +17,9 @@ import com.wenziyue.uid.core.IdGen;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.rocketmq.client.producer.SendStatus;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+
 /**
  * @author wenziyue
  */
@@ -39,9 +45,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TestController {
 
     private final AsyncService asyncService;
-    private final MdcTaskDecorator mdcTaskDecorator;
+//    private final MdcTaskDecorator mdcTaskDecorator;
+    private final ExecutorService executorService;
     private final IdGen idGen;
     private final ThirdOauthService thirdOathService;
+    private final RocketMQTemplate rocketMQTemplate;
 
     /**
      * 测试uid-starter
@@ -116,15 +124,15 @@ public class TestController {
     public String testCompletableFuture() {
         log.info("主线程启动任务");
 
-        ExecutorService executor = MdcExecutors.newFixedThreadPoolWithMdc(2, mdcTaskDecorator);
+//        ExecutorService executor = MdcExecutors.newFixedThreadPoolWithMdc(2, mdcTaskDecorator);
 
         CompletableFuture.runAsync(() -> {
             log.info("异步任务 A 执行中...");
-        }, executor);
+        }, executorService);
 
         CompletableFuture.runAsync(() -> {
             log.info("异步任务 B 执行中...");
-        }, executor);
+        }, executorService);
 
         return "CompletableFuture 异步任务已提交";
     }
@@ -170,6 +178,16 @@ public class TestController {
         log.info("userEntity:{}", userEntity);
 
         return blogUserDetails == null ? "null" : blogUserDetails.toString();
+    }
+
+    @GetMapping("/testRocketMqTopic")
+    public void testRocketMqTopic() {
+        val sendResult = rocketMQTemplate.syncSend("test_topic:default", MessageBuilder.withPayload("hello").build());
+        log.info("sendResult:{}", sendResult);
+        if (sendResult == null || !sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
+            log.error("slug加入mq失败:{}", sendResult);
+            throw new ApiException(BlogResultCode.SLUG_GENERATE_ERROR);
+        }
     }
 
 }
