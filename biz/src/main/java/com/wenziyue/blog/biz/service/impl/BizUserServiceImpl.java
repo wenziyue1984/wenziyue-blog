@@ -107,6 +107,7 @@ public class BizUserServiceImpl implements BizUserService {
 
             // 生成token返回 && 维护活跃token列表
             val token = jwtUtils.generateToken(userEntity.getId().toString());
+            userEntity = userService.getById(userEntity.getId());
             securityUtils.userInfoSaveInRedisAndRefreshUserToken(userEntity, token, null, expire);
             return token;
         } catch (ApiException e) {

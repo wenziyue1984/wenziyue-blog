@@ -37,8 +37,19 @@ public enum BlogResultCode implements IResultCode {
 
     ARTICLE_TITLE_EMPTY("60150", "文章标题为空"),
     ARTICLE_CONTENT_EMPTY("60160", "文章内容为空"),
-    ARTICLE_SAVE_ERROR("60170", "文章保存失败"),
+    ARTICLE_SAVE_OR_UPDATE_ERROR("60170", "文章保存或修改失败"),
     ARTICLE_TITLE_REPEAT("60180", "文章标题重复"),
+    ARTICLE_TAT_EMPTY("60190", "文章标签不存在"),
+    ARTICLE_NOT_EXIST("60200", "文章不存在"),
+
+    USER_NO_PERMISSION("60210", "无操作权限"),
+    HIDDEN_CANNOT_SET_TOP("60220", "隐藏的文章不能置顶"),
+    USER_TOP_ARTICLE_LIMIT("60230", "置顶文章不能超过3篇"),
+
+    USER_CANNOT_LIKE_SELF_ARTICLE("60240", "不能点赞自己的文章"),
+    USER_LIKE_ARTICLE_EXIST("60250", "用户已经点赞过该文章"),
+    USER_LIKE_ERROR("60260", "点赞失败"),
+    USER_CANCEL_LIKE_ERROR("60270", "取消点赞失败"),
     ;
 
     private final String code;

@@ -19,6 +19,6 @@ public class ExecutorConfig {
 
     @Bean(name = "executorService")
     public ExecutorService executorService() {
-        return MdcExecutors.newFixedThreadPoolWithMdc(5, mdcTaskDecorator);
+        return MdcExecutors.newFixedThreadPoolWithMdc(10, mdcTaskDecorator);
     }
 }

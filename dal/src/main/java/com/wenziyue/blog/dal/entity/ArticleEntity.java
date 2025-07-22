@@ -48,9 +48,6 @@ public class ArticleEntity extends BaseEntity {
     @TableField("slug")
     private String slug;
 
-    @TableField("keywords")
-    private String keywords;
-
     @TableField("is_top")
     private Boolean isTop;
 

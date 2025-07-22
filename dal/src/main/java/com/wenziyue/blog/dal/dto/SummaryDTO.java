@@ -3,6 +3,7 @@ package com.wenziyue.blog.dal.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -21,13 +22,13 @@ public class SummaryDTO implements Serializable {
 
     private Long articleId;
 
-    private Integer version;
+    private String updateTime;
 
-    public SummaryDTO(String title, String content, List<String> usedSlugs, Long articleId, Integer version) {
+    public SummaryDTO(String title, String content, List<String> usedSlugs, Long articleId, String updateTime) {
         this.articleId = articleId;
         this.title = title;
         this.content = content;
         this.usedSlugs = usedSlugs;
-        this.version = version;
+        this.updateTime = updateTime;
     }
 }

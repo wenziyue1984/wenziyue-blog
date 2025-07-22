@@ -18,4 +18,17 @@ public class RedisLuaConfig {
         );
     }
 
+    @Bean("likeArticleScript")
+    public RedisScript<Boolean> likeArticleScript() {
+        return RedisScript.of(
+                new ClassPathResource("scripts/likeArticle.lua"),
+                Boolean.class
+        );
+    }
+
+    @Bean("cancelLikeArticleScript")
+    public RedisScript<Boolean> cancelLikeArticleScript() {
+        return RedisScript.of(new ClassPathResource("scripts/cancelLikeArticle.lua"), Boolean.class);
+    }
+
 }

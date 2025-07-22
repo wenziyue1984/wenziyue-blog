@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wenziyue.blog.dal.mapper.ArticleMapper">
+
+    <select id="page" resultType="com.wenziyue.blog.dal.entity.ArticleEntity">
+        select t0.id as id, t0.title as title, t0.cover_url as coverUrl, t0.view_count as viewCount, t0.like_count as likeCount, t0.slug as slug, t0.is_top as isTop, t0.status as status
+        from TB_WZY_BLOG_ARTICLE t0
+        <if test="dto.tagId != null">
+            inner join TB_WZY_BLOG_ARTICLE_TAG t1 on t0.id = t1.article_id
+        </if>
+        where t0.deleted = 0
+        <if test="dto.articleId != null">
+            and t0.id = #{dto.articleId}
+        </if>
+        <if test="dto.userId != null">
+            and t0.user_id = #{dto.userId}
+        </if>
+        <if test="dto.title != null and dto.title != ''">
+            and t0.title LIKE CONCAT('%', #{dto.title}, '%')
+        </if>
+        <if test="dto.filterHidden == true">
+            and t0.status = 0
+        </if>
+        <if test="dto.tagId != null">
+            and t1.tag_id = #{dto.tagId} and t1.deleted = 0
+        </if>
+        order by t0.user_id desc, t0.is_top desc, t0.sort desc, t0.update_time desc
+    </select>
+
+</mapper>

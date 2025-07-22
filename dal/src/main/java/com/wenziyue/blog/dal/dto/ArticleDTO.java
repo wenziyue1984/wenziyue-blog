@@ -3,6 +3,8 @@ package com.wenziyue.blog.dal.dto;
 import com.wenziyue.blog.common.enums.ArticleStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -13,11 +15,13 @@ import java.util.List;
  * @author wenziyue
  */
 @Data
+@SuperBuilder
+@NoArgsConstructor
 public class ArticleDTO implements Serializable {
 
     private static final long serialVersionUID = 1220720785369800323L;
 
-    @Schema(description = "文章id", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "文章id", example = "1", requiredMode = Schema.RequiredMode.AUTO)
     private Long id;
 
     @Schema(description = "标题", example = "name", maxLength = 20, minLength = 1, requiredMode = Schema.RequiredMode.REQUIRED)
@@ -39,8 +43,9 @@ public class ArticleDTO implements Serializable {
     @NotBlank(message = "封面图片链接不能为空")
     private String coverUrl;
 
-    @Schema(description = "标签列表", example = "['文学','编程']", requiredMode = Schema.RequiredMode.AUTO)
-    private List<String> tagList;
+    @Schema(description = "标签id列表", example = "[0,1]", requiredMode = Schema.RequiredMode.AUTO)
+    @Size(max = 10, message = "标签个数不能超过10个")
+    private List<TagDTO> tagList;
 
     @Schema(description = "阅读量", example = "100", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer viewCount;
@@ -51,13 +56,10 @@ public class ArticleDTO implements Serializable {
     @Schema(description = "slug", example = "slug", maxLength = 255, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String slug;
 
-    @Schema(description = "关键字", example = "keywords", maxLength = 255, requiredMode = Schema.RequiredMode.AUTO)
-    private String keywords;
-
-    @Schema(description = "是否置顶", example = "ture", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "是否置顶", example = "ture", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Boolean isTop;
 
-    @Schema(description = "排序序号", example = "1", requiredMode = Schema.RequiredMode.AUTO)
+    @Schema(description = "排序序号", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer sort;
 
     @Schema(description = "文章状态", requiredMode = Schema.RequiredMode.NOT_REQUIRED)

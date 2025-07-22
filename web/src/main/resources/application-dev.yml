@@ -17,8 +17,8 @@ wenziyue:
     prepare-next-percent: 70
   # wenziyue-security-starter
   security:
-    expire: 1800 # token过期时间，测试30分钟
-    refresh-before-expiration: 120  # 刷新token时间，测试2分钟
+    expire: 43200 # token过期时间，测试12小时
+    refresh-before-expiration: 3600  # 刷新token时间，测试1小时
     white-list:
       - "/test/**"
       - "/captcha/**"

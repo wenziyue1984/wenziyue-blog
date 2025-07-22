@@ -12,6 +12,7 @@ import com.wenziyue.framework.exception.ApiException;
 import com.wenziyue.framework.trace.MdcExecutors;
 import com.wenziyue.framework.trace.MdcTaskDecorator;
 import com.wenziyue.idempotent.annotation.WenziyueIdempotent;
+import com.wenziyue.redis.utils.RedisUtils;
 import com.wenziyue.uid.common.Status;
 import com.wenziyue.uid.core.IdGen;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -50,6 +48,7 @@ public class TestController {
     private final IdGen idGen;
     private final ThirdOauthService thirdOathService;
     private final RocketMQTemplate rocketMQTemplate;
+    private final RedisUtils redisUtils;
 
     /**
      * 测试uid-starter
@@ -188,6 +187,11 @@ public class TestController {
             log.error("slug加入mq失败:{}", sendResult);
             throw new ApiException(BlogResultCode.SLUG_GENERATE_ERROR);
         }
+    }
+
+    @GetMapping("/testIncrementWithExpire")
+    public void testIncrementWithExpire() throws Exception {
+        redisUtils.increment("test:increment", 1L, 2L, TimeUnit.MINUTES);
     }
 
 }
