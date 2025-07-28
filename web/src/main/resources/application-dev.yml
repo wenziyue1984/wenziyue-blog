@@ -9,6 +9,8 @@ logging:
 
 rocketmq:
   name-server: ${ROCKET_MQ_SERVER_DEV}
+  consumer:
+    group: ["article-pv-consumer-group"]
 
 wenziyue:
   # wenziyue-uid-starter
@@ -19,13 +21,6 @@ wenziyue:
   security:
     expire: 43200 # token过期时间，测试12小时
     refresh-before-expiration: 3600  # 刷新token时间，测试1小时
-    white-list:
-      - "/test/**"
-      - "/captcha/**"
-      - "/auth/register"
-      - "/auth/login"
-      - "/auth/googleLogin"
-
 
 # swagger-ui 配置
 springdoc:

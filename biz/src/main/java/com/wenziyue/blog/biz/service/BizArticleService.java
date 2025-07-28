@@ -53,4 +53,6 @@ public interface BizArticleService {
     void likeArticle(Long articleId);
 
     void cancelLikeArticle(Long articleId);
+
+    void pv(ArticlePvDTO dto);
 }

@@ -194,4 +194,9 @@ public class TestController {
         redisUtils.increment("test:increment", 1L, 2L, TimeUnit.MINUTES);
     }
 
+    @GetMapping("/testIncrement")
+    public void testIncrement() throws Exception {
+        redisUtils.increment("test:increment", 1);
+    }
+
 }

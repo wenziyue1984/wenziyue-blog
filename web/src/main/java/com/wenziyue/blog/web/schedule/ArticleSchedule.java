@@ -3,28 +3,19 @@ package com.wenziyue.blog.web.schedule;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wenziyue.blog.biz.service.BizArticleService;
 import com.wenziyue.blog.common.constants.RedisConstant;
-import com.wenziyue.blog.common.enums.ArticleLikeTypeEnum;
 import com.wenziyue.blog.dal.entity.ArticleEntity;
-import com.wenziyue.blog.dal.entity.ArticleLikeEntity;
-import com.wenziyue.blog.dal.service.ArticleLikeService;
 import com.wenziyue.blog.dal.service.ArticleService;
-import com.wenziyue.framework.utils.EnumUtils;
 import com.wenziyue.redis.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.data.redis.connection.stream.PendingMessages;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 import static com.wenziyue.blog.common.constants.RedisConstant.*;
 
@@ -41,7 +32,6 @@ public class ArticleSchedule {
     private final ExecutorService executorService;
     private final BizArticleService bizArticleService;
     private final RedisUtils redisUtils;
-    private final ArticleLikeService articleLikeService;
 
     /**
      * 生成摘要和slug
@@ -76,26 +66,28 @@ public class ArticleSchedule {
      */
     @Scheduled(cron = "0 0 3 * * ?")
     void syncArticleLikeCount() {
-        log.info("开始同步文章点赞数");
+        log.info("开始同步文章点赞数和浏览量");
         List<ArticleEntity> articleEntityList;
         int pageSize = 500;
         int offset = 0;
         do {
             articleEntityList = articleService.list(Wrappers.<ArticleEntity>lambdaQuery()
-                    .select(ArticleEntity::getId, ArticleEntity::getLikeCount)
+                    .select(ArticleEntity::getId, ArticleEntity::getLikeCount, ArticleEntity::getViewCount)
                     .orderByAsc(ArticleEntity::getId)
                     .last("limit " + offset + "," + pageSize));
             offset += pageSize;
             for (ArticleEntity articleEntity : articleEntityList) {
                 try {
-                    val count = redisUtils.get(RedisConstant.ARTICLE_LIKE_COUNT_KEY + articleEntity.getId(), Integer.class);
-                    if (count != null && !count.equals(articleEntity.getLikeCount())) {
+                    val likeCount = redisUtils.get(RedisConstant.ARTICLE_LIKE_COUNT_KEY + articleEntity.getId(), Integer.class);
+                    val pvCount = redisUtils.get(RedisConstant.ARTICLE_PV_COUNT_KEY + articleEntity.getId(), Integer.class);
+                    if ((likeCount != null && !likeCount.equals(articleEntity.getLikeCount())) || (pvCount != null && !pvCount.equals(articleEntity.getViewCount()))) {
                         articleService.update(Wrappers.<ArticleEntity>lambdaUpdate()
                                 .eq(ArticleEntity::getId, articleEntity.getId())
-                                .set(ArticleEntity::getLikeCount, count));
+                                .set(ArticleEntity::getLikeCount, likeCount)
+                                .set(ArticleEntity::getViewCount, pvCount));
                     }
                 } catch (Exception e) {
-                    log.error("同步文章点赞数失败，文章id:{}", articleEntity.getId(), e);
+                    log.error("同步文章点赞数和浏览量失败，文章id:{}", articleEntity.getId(), e);
                 }
             }
         } while (!articleEntityList.isEmpty());

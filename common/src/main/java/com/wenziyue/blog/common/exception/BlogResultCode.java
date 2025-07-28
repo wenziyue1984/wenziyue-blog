@@ -50,6 +50,9 @@ public enum BlogResultCode implements IResultCode {
     USER_LIKE_ARTICLE_EXIST("60250", "用户已经点赞过该文章"),
     USER_LIKE_ERROR("60260", "点赞失败"),
     USER_CANCEL_LIKE_ERROR("60270", "取消点赞失败"),
+
+    PV_ERROR("60280", "pv统计失败"),
+
     ;
 
     private final String code;

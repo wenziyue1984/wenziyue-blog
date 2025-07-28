@@ -40,8 +40,7 @@ import java.util.stream.Collectors;
 
 import static com.wenziyue.blog.common.constants.RedisConstant.ARTICLE_UPDATE_TIME_KEY;
 import static com.wenziyue.blog.common.constants.RedisConstant.SLUG_LISTEN_KEY;
-import static com.wenziyue.blog.common.constants.RocketTopic.SlugTopic;
-import static com.wenziyue.blog.common.constants.RocketTopic.SummaryTopic;
+import static com.wenziyue.blog.common.constants.RocketTopic.*;
 
 /**
  * @author wenziyue
@@ -63,6 +62,15 @@ public class BizArticleServiceImpl implements BizArticleService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisScript<Boolean> likeArticleScript;
     private final RedisScript<Boolean> cancelLikeArticleScript;
+
+
+    @PostConstruct
+    public void init() {
+        if (redisUtils.hasKey(RedisConstant.ARTICLE_LIKE_STREAM_KEY)) {
+            return;
+        }
+        redisUtils.xGroupCreate(RedisConstant.ARTICLE_LIKE_STREAM_KEY, RedisConstant.ARTICLE_LIKE_STREAM_GROUP_NAME);
+    }
 
     @Override
     public String generateSlug(SlugDTO dto) {
@@ -517,13 +525,16 @@ public class BizArticleServiceImpl implements BizArticleService {
         }
     }
 
-    @PostConstruct
-    public void init() {
-        if (redisUtils.hasKey(RedisConstant.ARTICLE_LIKE_STREAM_KEY)) {
-            return;
+    @Override
+    public void pv(ArticlePvDTO dto) {
+        val sendResult = rocketMQTemplate.syncSend(ArticlePvTopic, dto);
+        if (sendResult == null || !sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
+            log.error("pv加入mq失败:{}", sendResult);
+            throw new ApiException(BlogResultCode.PV_ERROR);
         }
-        redisUtils.xGroupCreate(RedisConstant.ARTICLE_LIKE_STREAM_KEY, RedisConstant.ARTICLE_LIKE_STREAM_GROUP_NAME);
     }
+
+
 
 
 }

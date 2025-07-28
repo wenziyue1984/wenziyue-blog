@@ -63,4 +63,28 @@ public interface RedisConstant {
      * 文章点赞流消费者
      */
     String ARTICLE_LIKE_STREAM_CONSUMER_NAME = "consumer_1";
+
+    /**
+     * 文章pv
+     */
+    String ARTICLE_PV_COUNT_KEY = "blog:article:pv:count:";
+
+    /**
+     * 文章pv过滤
+     * blog:article:pv:filter:{articleId}+{sessionId}+{ip}
+     */
+    String ARTICLE_PV_FILTER_KEY = "blog:article:pv:filter:";
+
+    /**
+     * 文章pv布隆过滤器
+     * blog:article:pv:bloom:{articleId}+{index}
+     */
+    String ARTICLE_PV_BLOOM_KEY = "blog:article:pv:bloom:";
+
+    /**
+     * 每篇文章有几个bloom过滤器
+     * blog:article:pv:bloom:num:set:{articleId}
+     */
+    String ARTICLE_PV_BLOOM_NUM_SET_KEY = "blog:article:pv:bloom:num:set:";
+
 }

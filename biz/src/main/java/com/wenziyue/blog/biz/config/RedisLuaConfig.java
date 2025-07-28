@@ -3,6 +3,7 @@ package com.wenziyue.blog.biz.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
 /**
@@ -29,6 +30,14 @@ public class RedisLuaConfig {
     @Bean("cancelLikeArticleScript")
     public RedisScript<Boolean> cancelLikeArticleScript() {
         return RedisScript.of(new ClassPathResource("scripts/cancelLikeArticle.lua"), Boolean.class);
+    }
+
+    @Bean("countPV")
+    public org.springframework.data.redis.core.script.DefaultRedisScript<Long> countPV() {
+        DefaultRedisScript<Long> s = new DefaultRedisScript<>();
+        s.setLocation(new ClassPathResource("scripts/CountPV.lua"));
+        s.setResultType(Long.class);
+        return s;
     }
 
 }

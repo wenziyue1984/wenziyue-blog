@@ -9,6 +9,11 @@
 -- ARGV[4] = 最大点赞用户数
 -- ARGV[5] = 点赞类型（如 LIKE = 1）
 
+-- 已点赞直接退出
+if redis.call('ZSCORE', KEYS[1], ARGV[2]) then
+    return true
+end
+
 -- 添加到用户点赞文章 ZSet
 redis.call('ZADD', KEYS[1], ARGV[3], ARGV[2])
 

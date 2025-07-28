@@ -55,6 +55,8 @@ rocketmq:
   producer:
     send-message-timeout: 10000 # 默认是 3000 毫秒
     group: default-producer
+  consumer:
+    group: ["article-pv-consumer-group"]
 
 
 wenziyue:
@@ -77,6 +79,7 @@ wenziyue:
       - "/auth/register"
       - "/auth/login"
       - "/auth/googleLogin"
+      - "/article/pv"
   # wenziyue-uid-starter
   uid:
     biz-tag: blog

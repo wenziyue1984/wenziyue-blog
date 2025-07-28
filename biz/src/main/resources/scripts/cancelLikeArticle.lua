@@ -8,6 +8,12 @@
 -- ARGV[3] = 当前时间戳
 -- ARGV[4] = 行为类型（CANCEL_LIKE = 2）
 
+
+-- 没有点赞直接退出
+if not redis.call('ZSCORE', KEYS[1], ARGV[2]) then
+    return true
+end
+
 -- 如果用户点赞记录中存在该文章，移除
 redis.call('ZREM', KEYS[1], ARGV[2])
 

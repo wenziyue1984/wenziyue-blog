@@ -1,10 +1,7 @@
 package com.wenziyue.blog.web.controller;
 
 import com.wenziyue.blog.biz.service.BizArticleService;
-import com.wenziyue.blog.dal.dto.ArticleDTO;
-import com.wenziyue.blog.dal.dto.ArticlePageDTO;
-import com.wenziyue.blog.dal.dto.TagDTO;
-import com.wenziyue.blog.dal.dto.TagPageDTO;
+import com.wenziyue.blog.dal.dto.*;
 import com.wenziyue.blog.dal.entity.TagEntity;
 import com.wenziyue.framework.annotation.ResponseResult;
 import com.wenziyue.mybatisplus.page.PageResult;
@@ -16,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -119,6 +117,14 @@ public class ArticleController {
     @PreAuthorize("hasAuthority('USER')")
     public void cancelLikeArticle(@Parameter(description = "文章id", required = true) @PathVariable Long id) {
         bizArticleService.cancelLikeArticle(id);
+    }
+
+    @Operation(summary = "文章pv统计", description = "文章pv统计")
+    @PostMapping("/pv")
+    public void pv(@Parameter(description = "文章pv统计参数", required = true) @Valid @RequestBody ArticlePvDTO dto, HttpServletRequest request) {
+        dto.setIp(request.getRemoteAddr());
+        dto.setUserAgent(request.getHeader("User-Agent"));
+        bizArticleService.pv(dto);
     }
 
 
