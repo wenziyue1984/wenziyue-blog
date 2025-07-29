@@ -53,6 +53,10 @@ public enum BlogResultCode implements IResultCode {
 
     PV_ERROR("60280", "pv统计失败"),
 
+    FAVORITES_FOLDER_NAME_REPEAT("60290", "收藏夹重名"),
+    FAVORITES_FOLDER_NOT_EXIST("60300", "收藏夹不存在"),
+    FAVORITES_ARTICLE_EXIST("60310", "文章已收藏"),
+    FAVORITES_ARTICLE_NOT_EXIST("60320", "收藏夹中并没有收藏该文章"),
     ;
 
     private final String code;

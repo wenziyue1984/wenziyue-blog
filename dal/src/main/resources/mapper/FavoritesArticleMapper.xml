@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wenziyue.blog.dal.mapper.FavoritesArticleMapper">
+
+    <select id="selectFavoritesArticlePage" resultType="com.wenziyue.blog.dal.dto.ArticleDTO">
+        SELECT
+            t1.id as id,
+            t1.title as title,
+            t1.summary as summary,
+            t1.cover_url as coverUrl
+        FROM TB_WZY_FAVORITES_ARTICLE t0
+                 LEFT JOIN TB_WZY_BLOG_ARTICLE t1 ON t0.article_id = t1.id
+        WHERE t0.deleted = 0
+          AND t0.favorites_folder_id = #{folderId}
+          AND t0.user_id = #{userId}
+        ORDER BY t0.create_time DESC
+    </select>
+</mapper>

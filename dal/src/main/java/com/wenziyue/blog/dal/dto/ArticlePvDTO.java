@@ -33,6 +33,9 @@ public class ArticlePvDTO implements Serializable {
     @Schema(description = "userAgent", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String userAgent;
 
+    @Schema(description = "时间戳", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String timestamp;
+
     @Schema(description = "referer", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "referer不能为空")
     private String referer;

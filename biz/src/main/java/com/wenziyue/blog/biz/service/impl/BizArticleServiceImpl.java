@@ -9,10 +9,7 @@ import com.wenziyue.blog.common.enums.*;
 import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.common.utils.BlogUtils;
 import com.wenziyue.blog.dal.dto.*;
-import com.wenziyue.blog.dal.entity.ArticleEntity;
-import com.wenziyue.blog.dal.entity.ArticleOperationLogEntity;
-import com.wenziyue.blog.dal.entity.ArticleTagEntity;
-import com.wenziyue.blog.dal.entity.TagEntity;
+import com.wenziyue.blog.dal.entity.*;
 import com.wenziyue.blog.dal.service.*;
 import com.wenziyue.framework.common.CommonCode;
 import com.wenziyue.framework.exception.ApiException;
@@ -62,6 +59,8 @@ public class BizArticleServiceImpl implements BizArticleService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisScript<Boolean> likeArticleScript;
     private final RedisScript<Boolean> cancelLikeArticleScript;
+    private final FavoritesArticleService faService;
+    private final FavoritesFolderService ffService;
 
 
     @PostConstruct
@@ -534,7 +533,42 @@ public class BizArticleServiceImpl implements BizArticleService {
         }
     }
 
+    @Override
+    public void favoritesArticle(FavoritesArticleDTO dto) {
+        val articleEntity = articleService.getById(dto.getArticleId());
+        if (articleEntity == null) {
+            throw new ApiException(BlogResultCode.ARTICLE_NOT_EXIST);
+        }
+        val ffEntity = ffService.getById(dto.getFavoritesFolderId());
+        if (ffEntity == null) {
+            throw new ApiException(BlogResultCode.FAVORITES_FOLDER_NOT_EXIST);
+        }
+        val faEntity = faService.getOne(Wrappers.<FavoritesArticleEntity>lambdaQuery()
+                .eq(FavoritesArticleEntity::getFavoritesFolderId, dto.getFavoritesFolderId())
+                .eq(FavoritesArticleEntity::getArticleId, dto.getArticleId())
+                .eq(FavoritesArticleEntity::getUserId, authHelper.getCurrentUser().getId()));
+        if (faEntity != null) {
+//            throw new ApiException(BlogResultCode.FAVORITES_ARTICLE_EXIST);
+            return;
+        }
+        faService.save(FavoritesArticleEntity.builder()
+                .favoritesFolderId(dto.getFavoritesFolderId())
+                .articleId(dto.getArticleId())
+                .userId(authHelper.getCurrentUser().getId())
+                .build());
+    }
 
+    @Override
+    public void cancelFavoritesArticle(FavoritesArticleDTO dto) {
+        val one = faService.getOne(Wrappers.<FavoritesArticleEntity>lambdaQuery()
+                .eq(FavoritesArticleEntity::getFavoritesFolderId, dto.getFavoritesFolderId())
+                .eq(FavoritesArticleEntity::getArticleId, dto.getArticleId())
+                .eq(FavoritesArticleEntity::getUserId, authHelper.getCurrentUser().getId()));
+        if (one == null) {
+            throw new ApiException(BlogResultCode.FAVORITES_ARTICLE_NOT_EXIST);
+        }
+        faService.cancelFavoritesArticle(dto.getFavoritesFolderId(), dto.getArticleId(), authHelper.getCurrentUser().getId());
+    }
 
 
 }

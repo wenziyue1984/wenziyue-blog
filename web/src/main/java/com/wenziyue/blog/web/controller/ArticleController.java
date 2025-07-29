@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 
 /**
  * 文章接口
@@ -105,6 +106,20 @@ public class ArticleController {
         bizArticleService.cancelTopArticle(id);
     }
 
+    @Operation(summary = "文章收藏", description = "文章收藏")
+    @PostMapping("/favoritesArticle")
+    @PreAuthorize("hasAuthority('USER')")
+    public void favoritesArticle(@Parameter(description = "文章id", required = true) @RequestBody @Valid FavoritesArticleDTO dto) {
+        bizArticleService.favoritesArticle(dto);
+    }
+
+    @Operation(summary = "取消文章收藏", description = "取消文章收藏")
+    @PostMapping("/cancelFavoritesArticle")
+    @PreAuthorize("hasAuthority('USER')")
+    public void cancelFavoritesArticle(@Parameter(description = "文章id", required = true) @RequestBody @Valid FavoritesArticleDTO dto) {
+        bizArticleService.cancelFavoritesArticle(dto);
+    }
+
     @Operation(summary = "文章点赞", description = "文章点赞")
     @GetMapping("/likeArticle/{id}")
     @PreAuthorize("hasAuthority('USER')")
@@ -124,10 +139,8 @@ public class ArticleController {
     public void pv(@Parameter(description = "文章pv统计参数", required = true) @Valid @RequestBody ArticlePvDTO dto, HttpServletRequest request) {
         dto.setIp(request.getRemoteAddr());
         dto.setUserAgent(request.getHeader("User-Agent"));
+        dto.setTimestamp(LocalDateTime.now().toString());
         bizArticleService.pv(dto);
     }
-
-
-
 
 }

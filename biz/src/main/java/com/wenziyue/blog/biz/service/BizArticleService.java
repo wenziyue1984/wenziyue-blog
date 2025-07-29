@@ -55,4 +55,10 @@ public interface BizArticleService {
     void cancelLikeArticle(Long articleId);
 
     void pv(ArticlePvDTO dto);
+
+    @Transactional
+    void favoritesArticle(FavoritesArticleDTO dto);
+
+    @Transactional
+    void cancelFavoritesArticle(FavoritesArticleDTO dto);
 }

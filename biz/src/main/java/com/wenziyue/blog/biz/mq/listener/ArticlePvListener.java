@@ -10,7 +10,6 @@ import lombok.val;
 import org.apache.rocketmq.spring.annotation.ConsumeMode;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
@@ -32,12 +31,11 @@ import static com.wenziyue.blog.common.constants.RocketTopic.ArticlePvTopic;
 @Component
 @RocketMQMessageListener(topic = ArticlePvTopic, consumerGroup = "article-pv-consumer-group",
         consumeMode = ConsumeMode.CONCURRENTLY, // 消费模式，默认并发模式，消费顺序消息使用顺序模式
-        maxReconsumeTimes = 2, consumeThreadNumber = 3, // 设置线程数为3
+        maxReconsumeTimes = 2, consumeThreadNumber = 1, // 设置线程数为1
         enableMsgTrace = true)
 public class ArticlePvListener implements RocketMQListener<ArticlePvDTO> {
 
     private final RedisUtils redisUtils;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
     private final DefaultRedisScript<Long> countPV;
     private static final long BF_CAPACITY = 1000000;
