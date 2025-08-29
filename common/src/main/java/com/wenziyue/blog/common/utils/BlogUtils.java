@@ -4,6 +4,10 @@ import com.google.common.hash.Hashing;
 import lombok.val;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import static com.wenziyue.blog.common.constants.RedisConstant.*;
 
 /**
  * 博客工具类
@@ -48,6 +52,99 @@ public class BlogUtils {
         return Hashing.murmur3_128()
                 .hashString(raw, StandardCharsets.UTF_8)
                 .toString(); // 32个hex字符
+    }
+
+    /**
+     * 获取当天日期的YYYYMMDD
+     */
+    public static String getTodayDateFormat() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }
+
+    /**
+     * 获取昨天日期的YYYYMMDD
+     */
+    public static String getYesterdayDateFormat() {
+        return LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }
+
+    /**
+     * 获取明天日期的YYYYMMDD
+     */
+    public static String getTomorrowDateFormat() {
+        return LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }
+
+    /**
+     * 将评论id进行分片
+     * @param commentId 评论id
+     * @return 分片值，范围 0~63
+     */
+    public static int shardOfMurmur(String commentId) {
+        int h = Hashing.murmur3_32_fixed().hashUnencodedChars(commentId).asInt();
+        return h & 63; // 低 6 位，等价于 (h & 0x7fffffff) % 64
+    }
+
+    /**
+     * 获取评论点赞的分片key,带 hash tag，保证 srcKey 与 drainKey 在redis集群下同槽位
+     * @param shard 分片值
+     */
+    public static String shardKey(int shard) {
+        return COMMENT_LIKE_COUNT_HASH_PREFIX + "{sh" + shard + "}";
+    }
+
+    /**
+     * 根据评论id获取评论点赞hash的分片key
+     * @param commentId 评论id
+     */
+    public static String getCommentLikeCountHashKey(String commentId) {
+        return shardKey(shardOfMurmur(commentId));
+    }
+
+    /**
+     * 获取今天评论点赞cf的key
+     */
+    public static String getTodayCfKey() {
+        return COMMENT_LIKE_CUCKOO_PREFIX + getTodayDateFormat();
+    }
+
+    /**
+     * 获取明天评论点赞cf的key
+     */
+    public static String getTomorrowCfKey() {
+        return COMMENT_LIKE_CUCKOO_PREFIX + getTomorrowDateFormat();
+    }
+
+    /**
+     * 获取昨天评论点赞cf的key
+     */
+    public static String getYesterdayCfKey() {
+        return COMMENT_LIKE_CUCKOO_PREFIX + getYesterdayDateFormat();
+    }
+
+    /**
+     * 点赞评论闸门key
+     * @param commentId 评论id
+     * @param userId 用户id
+     */
+    public static String getSluiceGateKey (String commentId, String userId) {
+        return COMMENT_LIKE_SLUICE_GATE + commentId + ":" + userId;
+    }
+
+    /**
+     * 获取评论点赞hash的drain key
+     * @param shard 分片值
+     */
+    public static String getCommentLikeHashDrainKey(int shard) {
+        return shardKey(shard) + ":drain:" + System.currentTimeMillis();
+    }
+
+    /**
+     * 获取评论点赞hash的pattern key
+     * @param shard 分片值
+     */
+    public static String getCommentLikeHashPatternKey(int shard) {
+        return shardKey(shard) + ":drain:*";
     }
 
 }

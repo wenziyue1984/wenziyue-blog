@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-@TableName("TB_WZY_FAVORITES_FOLDER")
+@TableName("TB_WZY_BLOG_FAVORITES_FOLDER")
 public class FavoritesFolderEntity extends BaseEntity {
 
     @TableId(value = "id", type = IdType.INPUT)

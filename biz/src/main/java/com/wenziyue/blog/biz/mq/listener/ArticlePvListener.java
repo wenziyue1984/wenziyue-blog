@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.wenziyue.blog.common.constants.RedisConstant.*;
-import static com.wenziyue.blog.common.constants.RocketTopic.ArticlePvTopic;
+import static com.wenziyue.blog.common.constants.RocketMqTopic.ArticlePvTopic;
 
 /**
  * @author wenziyue

@@ -10,10 +10,10 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum ArticleLikeTypeEnum implements ICommonEnum {
+public enum CommentStatusEnum implements ICommonEnum {
 
-    LIKE(0, "点赞"),
-    CANCEL_LIKE(1, "取消点赞");
+    NORMAL(0, "正常"),
+    HIDDEN(1, "隐藏");
 
     @EnumValue
     private final Integer code;

@@ -1,14 +1,13 @@
 package com.wenziyue.blog.dal.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.wenziyue.blog.common.enums.ArticleLikeTypeEnum;
+import com.wenziyue.blog.common.enums.LikeTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * @author wenziyue
@@ -33,5 +32,5 @@ public class ArticleLikeEntity implements Serializable {
     private Long time;
 
     @TableField("type")
-    private ArticleLikeTypeEnum type;
+    private LikeTypeEnum type;
 }

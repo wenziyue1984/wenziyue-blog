@@ -1,6 +1,6 @@
 package com.wenziyue.blog.biz.handler;
 
-import com.wenziyue.blog.common.enums.ArticleLikeTypeEnum;
+import com.wenziyue.blog.common.enums.LikeTypeEnum;
 import com.wenziyue.blog.dal.entity.ArticleLikeEntity;
 import com.wenziyue.blog.dal.service.ArticleLikeService;
 import com.wenziyue.framework.utils.EnumUtils;
@@ -39,7 +39,7 @@ public class ArticleLikeHandler implements StreamListener<String, MapRecord<Stri
                     .userId(Long.valueOf(record.getValue().get("userId")))
                     .time(Long.valueOf(record.getValue().get("time")))
                     .type(EnumUtils.fromCode(
-                            ArticleLikeTypeEnum.class,
+                            LikeTypeEnum.class,
                             Integer.parseInt(record.getValue().get("type"))))
                     .build();
 

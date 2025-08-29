@@ -6,6 +6,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
+import java.util.List;
+
 /**
  * @author wenziyue
  */
@@ -38,6 +40,26 @@ public class RedisLuaConfig {
         s.setLocation(new ClassPathResource("scripts/CountPV.lua"));
         s.setResultType(Long.class);
         return s;
+    }
+
+    @Bean("createCf")
+    public RedisScript<Long> createCf() {
+        return RedisScript.of(new ClassPathResource("scripts/createCf.lua"), Long.class);
+    }
+
+    @Bean("changeHashKey")
+    public RedisScript<Long> changeHashKey() {
+        return RedisScript.of(new ClassPathResource("scripts/changeHashKey.lua"), Long.class);
+    }
+
+    @Bean("commentLike")
+    public RedisScript<List> commentLike() {
+        return RedisScript.of(new ClassPathResource("scripts/commentLike.lua"), List.class);
+    }
+
+    @Bean("cancelCommentLike")
+    public RedisScript<List> cancelCommentLike() {
+        return RedisScript.of(new ClassPathResource("scripts/cancelCommentLike.lua"), List.class);
     }
 
 }

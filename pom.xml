@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>com.wenziyue</groupId>
                 <artifactId>wenziyue-redis-starter</artifactId>
-                <version>1.0.6</version>
+                <version>1.0.10</version>
             </dependency>
             <dependency>
                 <groupId>com.wenziyue</groupId>
@@ -194,6 +194,10 @@
         <repository>
             <id>github-security</id>
             <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-security-starter</url>
+        </repository>
+        <repository>
+            <id>github-redis</id>
+            <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-redis-starter</url>
         </repository>
     </repositories>
 

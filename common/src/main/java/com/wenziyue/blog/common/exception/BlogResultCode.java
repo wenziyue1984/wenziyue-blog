@@ -53,10 +53,20 @@ public enum BlogResultCode implements IResultCode {
 
     PV_ERROR("60280", "pv统计失败"),
 
+    GLOBAL_RATE_LIMITED("60281", "操作太频繁"),
+
     FAVORITES_FOLDER_NAME_REPEAT("60290", "收藏夹重名"),
     FAVORITES_FOLDER_NOT_EXIST("60300", "收藏夹不存在"),
     FAVORITES_ARTICLE_EXIST("60310", "文章已收藏"),
     FAVORITES_ARTICLE_NOT_EXIST("60320", "收藏夹中并没有收藏该文章"),
+
+    COMMENT_NOT_EXIST("60330", "评论不存在"),
+    COMMENT_CONTENT_EMPTY("60340", "评论内容为空"),
+    COMMENT_OVER_TEN_TIMES("60350", "评论过于频繁"),
+    COMMENT_CONTENT_REPEAT("60360", "频繁发布相同内容"),
+    COMMENT_LIKE_ERROR("60370", "点赞失败"),
+    COMMENT_CANCEL_LIKE_ERROR("60380", "取消点赞失败"),
+
     ;
 
     private final String code;

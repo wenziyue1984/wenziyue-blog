@@ -18,4 +18,8 @@ public interface FavoritesArticleMapper extends BaseMapper<FavoritesArticleEntit
     @Delete("delete from TB_WZY_FAVORITES_ARTICLE " +
             "where favorites_folder_id = #{favoritesFolderId} and article_id = #{articleId} and user_id = #{userId}")
     void cancelFavoritesArticle(@Param("favoritesFolderId") Long favoritesFolderId, @Param("articleId") Long articleId, @Param("userId") Long userId);
+
+    @Delete("delete from TB_WZY_FAVORITES_ARTICLE " +
+            "where favorites_folder_id = #{favoritesFolderId}")
+    void removeByFavoritesFolderId(@Param("favoritesFolderId") Long favoritesFolderId);
 }

@@ -87,4 +87,41 @@ public interface RedisConstant {
      */
     String ARTICLE_PV_BLOOM_NUM_SET_KEY = "blog:article:pv:bloom:num:set:";
 
+    /**
+     * 评论检查key
+     * blog:comment:check:{userId}
+     */
+    String COMMENT_CHECK_KEY = "blog:comment:check:";
+
+    /**
+     * 限流key前缀
+     * blog:limitRate:{业务自己传入}
+     */
+    String LIMIT_RATE_PREFIX = "blog:limitRate:";
+
+    /**
+     * 评论点赞布谷过滤器，用于检测用户是否点赞过该评论
+     * blog:comment:like:cuckoo:{date}:
+     */
+    String COMMENT_LIKE_CUCKOO_PREFIX = "blog:comment:like:cuckoo:";
+
+    /**
+     * 评论点赞滑窗过滤器，用于检测短期内用户是否点赞过该评论
+     * blog:comment:like:sluice:gate:{commentId+userId}
+     */
+    String COMMENT_LIKE_SLUICE_GATE = "blog:comment:like:sluice:gate:";
+
+    /**
+     * 保存点赞数的hash前缀
+     * blog:comment:like:count:{sh + index}
+     */
+    String COMMENT_LIKE_COUNT_HASH_PREFIX = "blog:comment:like:count:";
+
+    /**
+     * 同步点赞数锁
+     * blog:comment:like:sync:lock
+     */
+    String COMMENT_LIKE_SYNC_LOCK_KEY = "blog:comment:like:sync:lock";
+
+
 }

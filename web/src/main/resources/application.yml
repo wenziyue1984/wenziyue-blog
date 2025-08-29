@@ -42,6 +42,11 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true   # 第一次启动自动 baseline
     create-schemas: true  # 如果不存在目标schema, 自动创建
+  task:
+    scheduling:
+      shutdown:
+        await-termination: true # 关机时等待所有任务执行完毕
+        await-termination-period: 20s # 最多等待时间
 
 mybatis-plus:
   configuration:
@@ -56,7 +61,7 @@ rocketmq:
     send-message-timeout: 10000 # 默认是 3000 毫秒
     group: default-producer
   consumer:
-    group: ["article-pv-consumer-group"]
+    group: ["article-pv-consumer-group", "comment-like-consumer-group"]
 
 
 wenziyue:

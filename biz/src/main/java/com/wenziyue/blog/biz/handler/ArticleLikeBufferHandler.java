@@ -1,6 +1,6 @@
 package com.wenziyue.blog.biz.handler;
 
-import com.wenziyue.blog.common.enums.ArticleLikeTypeEnum;
+import com.wenziyue.blog.common.enums.LikeTypeEnum;
 import com.wenziyue.blog.dal.entity.ArticleLikeEntity;
 import com.wenziyue.blog.dal.service.ArticleLikeService;
 import com.wenziyue.framework.utils.EnumUtils;
@@ -87,7 +87,7 @@ public class ArticleLikeBufferHandler implements StreamListener<String, MapRecor
                     ids.add(r.getId().getValue());
                 }
 
-                // 满足批量写入条件（满100条 或 刷新时间大于2秒）
+                // 满足批量写入条件（满1000条 或 刷新时间大于2秒）
                 if (buffer.size() >= 1000 || (!buffer.isEmpty() && System.currentTimeMillis() - lastFlushTime >= FLUSH_INTERVAL_MS)) {
                     likeService.saveBatch(buffer);
                     redisUtils.xAck(ARTICLE_LIKE_STREAM_KEY, ARTICLE_LIKE_STREAM_GROUP_NAME, ids);
@@ -110,7 +110,7 @@ public class ArticleLikeBufferHandler implements StreamListener<String, MapRecor
                 .articleId(Long.valueOf(map.get("articleId").toString()))
                 .userId(Long.valueOf(map.get("userId").toString()))
                 .time(Long.valueOf(map.get("time").toString()))
-                .type(EnumUtils.fromCode(ArticleLikeTypeEnum.class, Integer.parseInt(map.get("type").toString())))
+                .type(EnumUtils.fromCode(LikeTypeEnum.class, Integer.parseInt(map.get("type").toString())))
                 .build();
     }
 

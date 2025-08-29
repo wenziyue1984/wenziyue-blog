@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.wenziyue.blog.common.constants.RedisConstant.ARTICLE_UPDATE_TIME_KEY;
 import static com.wenziyue.blog.common.constants.RedisConstant.SLUG_LISTEN_KEY;
-import static com.wenziyue.blog.common.constants.RocketTopic.*;
+import static com.wenziyue.blog.common.constants.RocketMqTopic.*;
 
 /**
  * @author wenziyue
@@ -367,6 +367,8 @@ public class BizArticleServiceImpl implements BizArticleService {
         // 删除redis中的点赞数据
         redisUtils.delete(RedisConstant.ARTICLE_LIKE_COUNT_KEY + id);
         redisUtils.delete(RedisConstant.ARTICLE_LIKE_USERS_KEY + id);
+        // 删除评论、以及评论点赞数据（其实不用，因为文章是逻辑删除，留着评论也不影响什么，所以暂时不删除了）
+
     }
 
     @Override
@@ -470,7 +472,7 @@ public class BizArticleServiceImpl implements BizArticleService {
                 articleId,
                 System.currentTimeMillis(),
                 50,
-                ArticleLikeTypeEnum.LIKE.getCode()
+                LikeTypeEnum.LIKE.getCode()
         );
         val result = redisTemplate.execute(likeArticleScript, keys, args.toArray());
         if (result == null || !result) {
@@ -516,7 +518,7 @@ public class BizArticleServiceImpl implements BizArticleService {
                 userId,
                 articleId,
                 System.currentTimeMillis(),
-                ArticleLikeTypeEnum.CANCEL_LIKE.getCode()
+                LikeTypeEnum.CANCEL_LIKE.getCode()
         );
         Boolean result = redisTemplate.execute(cancelLikeArticleScript, keys, args.toArray());
         if (result == null || !result) {

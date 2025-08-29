@@ -2,9 +2,7 @@ package com.wenziyue.blog.dal.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.wenziyue.mybatisplus.base.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -14,16 +12,13 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-@TableName("TB_WZY_BLOG_FAVORITES_ARTICLE")
-public class FavoritesArticleEntity extends BaseEntity {
+@TableName("TB_WZY_BLOG_COMMENT_LIKE")
+public class CommentLikeEntity {
 
-    @TableField("article_id")
-    private Long articleId;
-
-    @TableField("favorites_folder_id")
-    private Long favoritesFolderId;
+    @TableField("comment_id")
+    private Long commentId;
 
     @TableField("user_id")
     private Long userId;
+
 }

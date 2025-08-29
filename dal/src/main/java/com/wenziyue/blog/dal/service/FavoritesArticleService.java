@@ -14,4 +14,6 @@ public interface FavoritesArticleService extends PageExtendService<FavoritesArti
     PageResult<ArticleDTO> selectFavoritesArticlePage(PageRequest dto, Long ffId, Long userId);
 
     void cancelFavoritesArticle(Long favoritesFolderId, Long articleId, Long userId);
+
+    void removeByFavoritesFolderId(Long favoritesFolderId);
 }

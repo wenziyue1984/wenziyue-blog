@@ -3,6 +3,7 @@ package com.wenziyue.blog.biz.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wenziyue.blog.biz.security.AuthHelper;
 import com.wenziyue.blog.biz.service.BizFavoritesFolderService;
+import com.wenziyue.blog.biz.utils.IdUtils;
 import com.wenziyue.blog.common.enums.FavoritesFolderAuthEnum;
 import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.common.utils.BlogUtils;
@@ -10,7 +11,6 @@ import com.wenziyue.blog.dal.dto.ArticleDTO;
 import com.wenziyue.blog.dal.dto.FavoritesArticlePageDTO;
 import com.wenziyue.blog.dal.dto.FavoritesFolderDTO;
 import com.wenziyue.blog.dal.dto.FavoritesFolderPageDTO;
-import com.wenziyue.blog.dal.entity.FavoritesArticleEntity;
 import com.wenziyue.blog.dal.entity.FavoritesFolderEntity;
 import com.wenziyue.blog.dal.service.FavoritesArticleService;
 import com.wenziyue.blog.dal.service.FavoritesFolderService;
@@ -48,7 +48,7 @@ public class BizFavoritesFolderServiceImpl implements BizFavoritesFolderService 
         if (!list.isEmpty()) {
             throw new ApiException(BlogResultCode.FAVORITES_FOLDER_NAME_REPEAT);
         }
-        val id = idGen.nextId().getId();
+        val id = IdUtils.getID(idGen);
         ffService.save(FavoritesFolderEntity.builder()
                 .id(id)
                 .name(name)
@@ -100,8 +100,7 @@ public class BizFavoritesFolderServiceImpl implements BizFavoritesFolderService 
         }
         ffService.removeById(id);
         // 删除对应文件夹中的收藏文章
-        faService.remove(Wrappers.<FavoritesArticleEntity>lambdaQuery()
-                .eq(FavoritesArticleEntity::getFavoritesFolderId, id));
+        faService.removeByFavoritesFolderId(Long.valueOf(id));
     }
 
     @Override

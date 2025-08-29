@@ -34,4 +34,9 @@ public class FavoritesArticleServiceImpl extends ServiceImpl<FavoritesArticleMap
     public void cancelFavoritesArticle(Long favoritesFolderId, Long articleId, Long userId) {
         baseMapper.cancelFavoritesArticle(favoritesFolderId, articleId, userId);
     }
+
+    @Override
+    public void removeByFavoritesFolderId(Long favoritesFolderId) {
+        baseMapper.removeByFavoritesFolderId(favoritesFolderId);
+    }
 }
