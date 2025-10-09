@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wenziyue.blog.dal.mapper.ChatRecordMapper">
+
+
+    <select id="getUnreadMsgForSession" resultType="com.wenziyue.blog.dal.entity.ChatRecordEntity">
+        SELECT  x.session_id, x.seq, x.chat_type, x.msg_type, x.content,
+        x.from_user_id, x.to_user_id, x.status, x.`timestamp`, x.create_time, x.update_time
+        FROM (
+            SELECT  r.*,
+            ROW_NUMBER() OVER (PARTITION BY r.session_id ORDER BY r.seq ASC) AS rn
+            FROM TB_WZY_BLOG_CHAT_RECORD r
+            LEFT JOIN TB_WZY_BLOG_CHAT_SESSION_STATUS s
+                ON s.session_id = r.session_id AND s.user_id = #{userId}
+            WHERE r.deleted = 0 AND r.status = 0
+            AND r.session_id IN
+                <foreach collection="sessionIdList" item="sid" open="(" separator="," close=")">
+                    #{sid}
+                </foreach>
+            AND r.to_user_id = #{userId}
+            AND r.seq > COALESCE(s.last_read_seq,0)
+        ) x
+        WHERE x.rn  &lt;= #{num}
+        ORDER BY x.session_id ASC, x.seq ASC;
+    </select>
+
+    <select id="getSessionUnreadCount" resultType="com.wenziyue.blog.dal.dto.SessionUnreadDTO">
+        SELECT r.session_id AS sessionId, COUNT(*) AS unread
+        FROM TB_WZY_BLOG_CHAT_RECORD r
+        LEFT JOIN TB_WZY_BLOG_CHAT_SESSION_STATUS s
+            ON s.session_id = r.session_id
+            AND s.user_id = #{userId}
+        WHERE r.deleted = 0
+        AND r.status = 0
+        AND r.to_user_id = #{userId}
+        AND r.session_id IN
+            <foreach collection="sessionIdList" item="sid" open="(" separator="," close=")">
+                #{sid}
+            </foreach>
+        AND r.seq > COALESCE(s.last_read_seq,0)
+        GROUP BY r.session_id;
+    </select>
+
+    <select id="getLastMsgForSession" resultType="com.wenziyue.blog.dal.entity.ChatRecordEntity">
+        SELECT r.*
+        FROM TB_WZY_BLOG_CHAT_RECORD r
+        JOIN (SELECT session_id, MAX(seq) AS max_seq
+            FROM TB_WZY_BLOG_CHAT_RECORD
+            WHERE deleted = 0
+            AND status = 0
+            AND session_id IN
+                <foreach collection="sessionIdList" item="sid" open="(" separator="," close=")">
+                    #{sid}
+                </foreach>
+            GROUP BY session_id) x
+        ON r.session_id = x.session_id
+        AND r.seq = x.max_seq
+    </select>
+
+</mapper>

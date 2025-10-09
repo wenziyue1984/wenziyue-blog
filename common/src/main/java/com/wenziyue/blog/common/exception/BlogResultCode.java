@@ -67,6 +67,10 @@ public enum BlogResultCode implements IResultCode {
     COMMENT_LIKE_ERROR("60370", "点赞失败"),
     COMMENT_CANCEL_LIKE_ERROR("60380", "取消点赞失败"),
 
+    CHAT_RECORD_NOT_EXIST("60390", "聊天记录不存在"),
+    CHAT_SESSION_LAST_SEQ_ERROR("60400", "获取会话last_seq失败"),
+    CHAT_SESSION_EMPTY("60410", "会话不存在"),
+
     ;
 
     private final String code;

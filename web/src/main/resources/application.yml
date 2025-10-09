@@ -61,7 +61,7 @@ rocketmq:
     send-message-timeout: 10000 # 默认是 3000 毫秒
     group: default-producer
   consumer:
-    group: ["article-pv-consumer-group", "comment-like-consumer-group"]
+    group: ["article-pv-consumer-group", "comment-like-consumer-group", "chat-records-save-consumer-group"]
 
 
 wenziyue:
@@ -85,6 +85,8 @@ wenziyue:
       - "/auth/login"
       - "/auth/googleLogin"
       - "/article/pv"
+      - "/ws/**"
+      - "/lib/**"
   # wenziyue-uid-starter
   uid:
     biz-tag: blog
@@ -128,3 +130,4 @@ blog:
   init-admin: true  # 是否尝试初始化admin账号，默认false
   default-admin-name: ${DEFAULT_ADMIN_NAME:admin} # 默认admin账号
   default-admin-password: ${DEFAULT_ADMIN_PASSWORD:password}  # 默认admin密码
+  chat-last-time-zSet-size: 10000

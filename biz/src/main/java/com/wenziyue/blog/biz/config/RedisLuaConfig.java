@@ -62,4 +62,29 @@ public class RedisLuaConfig {
         return RedisScript.of(new ClassPathResource("scripts/cancelCommentLike.lua"), List.class);
     }
 
+    @Bean("getNextSeqIfPresent")
+    public RedisScript<Long> getNextSeqIfPresent() {
+        return RedisScript.of(new ClassPathResource("scripts/getNextSeqIfPresent.lua"), Long.class);
+    }
+
+    @Bean("nextOrElectRebuild")
+    public RedisScript<List> nextOrElectRebuild() {
+        return RedisScript.of(new ClassPathResource("scripts/nextOrElectRebuild.lua"), List.class);
+    }
+
+    @Bean("initFromBaseAndNext")
+    public RedisScript<Long> initFromBaseAndNext() {
+        return RedisScript.of(new ClassPathResource("scripts/initFromBaseAndNext.lua"), Long.class);
+    }
+
+    @Bean("lastOrElectRebuild")
+    public RedisScript<List> lastOrElectRebuild() {
+        return RedisScript.of(new ClassPathResource("scripts/lastOrElectRebuild.lua"), List.class);
+    }
+
+    @Bean("initFromBase")
+    public RedisScript<Long> initFromBase() {
+        return RedisScript.of(new ClassPathResource("scripts/initFromBase.lua"), Long.class);
+    }
+
 }

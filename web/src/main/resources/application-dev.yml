@@ -10,7 +10,7 @@ logging:
 rocketmq:
   name-server: ${ROCKET_MQ_SERVER_DEV}
   consumer:
-    group: ["article-pv-consumer-group"]
+    group: ["article-pv-consumer-group", "comment-like-consumer-group", "chat-records-save-consumer-group"]
 
 wenziyue:
   # wenziyue-uid-starter

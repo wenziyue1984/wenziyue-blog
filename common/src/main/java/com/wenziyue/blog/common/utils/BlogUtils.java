@@ -6,6 +6,7 @@ import lombok.val;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.wenziyue.blog.common.constants.RedisConstant.*;
 
@@ -145,6 +146,60 @@ public class BlogUtils {
      */
     public static String getCommentLikeHashPatternKey(int shard) {
         return shardKey(shard) + ":drain:*";
+    }
+
+    /**
+     * 生成redis缓存key：ChatSessionKey
+     */
+    public static String getChatSessionKey(Long id1, Long id2) {
+        val idArray = compareIdSize(id1, id2);
+        return CHAT_SESSION_KEY + idArray[0] + ":" + idArray[1];
+    }
+
+    /**
+     * 比较两个id的大小
+     */
+    public static Long[] compareIdSize(Long id1, Long id2) {
+        return id1.compareTo(id2) <= 0 ? new Long[]{id1, id2} : new Long[]{id2, id1};
+    }
+
+    /**
+     * 休眠
+     */
+    public static void sleepJitter(long baseMs) {
+        try {
+            Thread.sleep(baseMs + ThreadLocalRandom.current().nextInt(30));
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * 获取今天聊天msgId set的key
+     */
+    public static String getTodayChatMsgIdSetKey(Long smallUserId, Long bigUserId) {
+        return CHAT_MSG_ID_SET_KEY + smallUserId + ":" + bigUserId + ":" + getTodayDateFormat();
+    }
+
+    /**
+     * 获取昨天评论点赞cf的key
+     */
+    public static String getYesterdayChatMsgIdSetKey(Long smallUserId, Long bigUserId) {
+        return CHAT_MSG_ID_SET_KEY + smallUserId + ":" + bigUserId + ":" + getYesterdayDateFormat();
+    }
+
+    /**
+     * 获取聊天会话seq的key
+     */
+    public static String getChatSessionSeqKey(Long smallUserId, Long bigUserId) {
+        return CHAT_SESSION_SEQ_KEY + smallUserId + ":" + bigUserId;
+    }
+
+    /**
+     * 获取聊天会话seq重建的key
+     */
+    public static String getChatSessionSeqRebuildKey(Long smallUserId, Long bigUserId) {
+        return CHAT_SESSION_SEQ_REBUILD_KEY + smallUserId + ":" + bigUserId;
     }
 
 }

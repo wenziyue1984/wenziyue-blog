@@ -41,7 +41,7 @@ import static com.wenziyue.blog.common.constants.RocketMqTopic.CommentLikeTopic;
 @Component
 @RocketMQMessageListener(topic = CommentLikeTopic, consumerGroup = "comment-like-consumer-group",
         consumeMode = ConsumeMode.ORDERLY, // 消费模式，默认并发模式，消费顺序消息使用顺序模式
-        maxReconsumeTimes = 2, consumeThreadNumber = 8, // 设置线程数为8,因为是顺序消费，所以和队列数对应
+        maxReconsumeTimes = 2, consumeThreadNumber = 4, // 设置线程数为4,因为是顺序消费，所以和topic的读队列数对应，它默认为4
         enableMsgTrace = true)
 public class CommentLikeListener implements RocketMQListener<CommentLikeMqDTO>, InitializingBean, RocketMQPushConsumerLifecycleListener {
 

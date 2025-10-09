@@ -36,7 +36,7 @@ public class ArticleSchedule {
     /**
      * 生成摘要和slug
      */
-    @Scheduled(cron = "0 0 * * * ?")
+//    @Scheduled(cron = "0 0 * * * ?")
     void generateSummaryAndSlug() {
         log.info("开始生成摘要和slug");
         val articleEntityList = articleService.list(Wrappers.<ArticleEntity>lambdaQuery()

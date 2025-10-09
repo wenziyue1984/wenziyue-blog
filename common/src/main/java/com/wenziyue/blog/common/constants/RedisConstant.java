@@ -101,7 +101,7 @@ public interface RedisConstant {
 
     /**
      * 评论点赞布谷过滤器，用于检测用户是否点赞过该评论
-     * blog:comment:like:cuckoo:{date}:
+     * blog:comment:like:cuckoo:{date}
      */
     String COMMENT_LIKE_CUCKOO_PREFIX = "blog:comment:like:cuckoo:";
 
@@ -124,4 +124,40 @@ public interface RedisConstant {
     String COMMENT_LIKE_SYNC_LOCK_KEY = "blog:comment:like:sync:lock";
 
 
+    /**
+     * 聊天会话
+     * blog:chat:session:key:{smallUserId}:{bigUserId}
+     */
+    String CHAT_SESSION_KEY = "blog:chat:session:key:";
+
+    /**
+     * 聊天会话序号
+     * blog:chat:session:seq:{smallUserId}:{bigUserId}
+     */
+    String CHAT_SESSION_SEQ_KEY = "blog:chat:session:seq:";
+
+    /**
+     * 聊天会话序号锁
+     * blog:chat:session:seq:lock:{sessionId}
+     */
+    String CHAT_SESSION_SEQ_LOCK_KEY = "blog:chat:session:seq:lock:";
+
+    /**
+     * 聊天会话序号重建标识
+     * blog:chat:session:seq:rebuild:{smallUserId}:{bigUserId}
+     */
+    String CHAT_SESSION_SEQ_REBUILD_KEY = "blog:chat:session:seq:rebuild:";
+
+    /**
+     * 每个会话的聊天消息id集合
+     * blog:chat:msgId:set:{smallUserId}:{bigUserId}:{date}
+     */
+    String CHAT_MSG_ID_SET_KEY = "blog:chat:msgId:set:";
+
+    /**
+     * 每个会话的聊天消息最后时间的有序集合，
+     * key是sessionId，score是时间戳，最大容量10000
+     * blog:chat:session:msg:lastTime:{userId}
+     */
+    String CHAT_SESSION_MSG_LAST_TIME_KEY = "blog:chat:session:msg:last:time:";
 }
