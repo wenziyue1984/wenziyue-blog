@@ -61,7 +61,7 @@ rocketmq:
     send-message-timeout: 10000 # 默认是 3000 毫秒
     group: default-producer
   consumer:
-    group: ["article-pv-consumer-group", "comment-like-consumer-group", "chat-records-save-consumer-group"]
+    group: ["article-pv-consumer-group", "comment-like-consumer-group", "chat-records-save-consumer-group", "notify-outbox-consumer-group"]
 
 
 wenziyue:

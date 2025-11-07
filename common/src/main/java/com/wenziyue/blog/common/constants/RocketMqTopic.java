@@ -14,4 +14,6 @@ public interface RocketMqTopic {
     String CommentLikeTopic = "blog_comment_like";
 
     String ChatRecordsSaveTopic = "blog_chat_records_save";
+
+    String NotifyOutboxTopic = "blog_notify_outbox";
 }

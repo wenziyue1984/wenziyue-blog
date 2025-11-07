@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS TB_WZY_BLOG_CHAT_SESSION_STATUS
     `user_id`          BIGINT    NOT NULL COMMENT '用户',
     `other_user_id`    BIGINT    NOT NULL COMMENT '聊天对方ID',
     `last_read_seq`    BIGINT    NULL COMMENT '最后阅读的会话中消息序号',
-#     `clear_before_seq` BIGINT    NULL COMMENT '清空记录消息序号（高于此序号才显示）',
     `top`              INT       NOT NULL DEFAULT 0 COMMENT '置顶 非0表示置顶，值越大顺序越高',
     `mute`             TINYINT   NOT NULL DEFAULT 0 COMMENT '免打扰',
     PRIMARY KEY (user_id, session_id)
@@ -45,15 +44,9 @@ CREATE TABLE IF NOT EXISTS TB_WZY_BLOG_CHAT_RECORD
     `from_user_id` BIGINT        NOT NULL COMMENT '发送者ID',
     `to_user_id`   BIGINT        NOT NULL COMMENT '接收者ID',
     `status`       TINYINT       NOT NULL DEFAULT 0 COMMENT '状态 0-正常 1-撤回',
-#     `read_status`   TINYINT       NOT NULL DEFAULT 0 COMMENT '是否已读 0-未读 1-已读',
     `timestamp`    BIGINT        NOT NULL COMMENT '时间戳，当作客户端消息ID，用于幂等控制',
     PRIMARY KEY (`session_id`, `seq`),
     INDEX `idx_from_user_id` (`from_user_id`, `status`, `to_user_id`),
     UNIQUE KEY `uk_from_client` (`from_user_id`, `timestamp`) -- 幂等
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT '聊天记录表';
-
-select t0 from TB_WZY_BLOG_CHAT_RECORD t0
-    left join TB_WZY_BLOG_CHAT_SESSION_STATUS t1
-        on t0.session_id = t1.session_id and t1.user_id = ?
-group by t0.session_id

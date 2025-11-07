@@ -1,12 +1,19 @@
 package com.wenziyue.blog.biz.mq.listener;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.wenziyue.blog.biz.utils.IdUtils;
 import com.wenziyue.blog.common.enums.LikeTypeEnum;
+import com.wenziyue.blog.common.enums.NotifyOutboxStatusEnum;
 import com.wenziyue.blog.common.utils.BlogUtils;
 import com.wenziyue.blog.dal.dto.CommentLikeMqDTO;
+import com.wenziyue.blog.dal.entity.CommentEntity;
 import com.wenziyue.blog.dal.entity.CommentLikeEntity;
+import com.wenziyue.blog.dal.entity.NotifyOutboxEntity;
 import com.wenziyue.blog.dal.service.CommentLikeService;
+import com.wenziyue.blog.dal.service.CommentService;
+import com.wenziyue.blog.dal.service.NotifyOutboxService;
 import com.wenziyue.redis.utils.RedisUtils;
+import com.wenziyue.uid.core.IdGen;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +27,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -51,6 +59,10 @@ public class CommentLikeListener implements RocketMQListener<CommentLikeMqDTO>, 
     private final RedisScript<List> commentLike;
     private final RedisScript<List> cancelCommentLike;
     private final StringRedisTemplate stringRedisTemplate;
+    private final TransactionTemplate transactionTemplate;
+    private final NotifyOutboxService notifyOutboxService;
+    private final CommentService commentService;
+    private final IdGen idGen;
 
     private final BlockingQueue<CommentLikeMqDTO> queue = new LinkedBlockingQueue<>(5000);
     private final AtomicBoolean running = new AtomicBoolean(true);
@@ -294,7 +306,41 @@ public class CommentLikeListener implements RocketMQListener<CommentLikeMqDTO>, 
                 if (!existingPairs.isEmpty()) {
                     removeDuplicateAndRepairData(likeList, existingPairs);
                 }
-                commentLikeService.insertIgnoreBatch(likeList);
+                // 批量查询一下评论对应的用户，本地消息表用
+                val commentEntityList = commentService.list(Wrappers.<CommentEntity>lambdaQuery()
+                        .select(CommentEntity::getUserId, CommentEntity::getId)
+                        .in(CommentEntity::getId, likeList.stream().map(CommentLikeMqDTO::getCommentId).collect(Collectors.toList())));
+                Map<Long, Long> commentAuthorMap = commentEntityList.stream()
+                        .collect(Collectors.toMap(CommentEntity::getId, CommentEntity::getUserId, (a,b)->a));
+                // 执行插入
+                transactionTemplate.executeWithoutResult(status -> {
+                    commentLikeService.insertIgnoreBatch(likeList);
+                    // 本地消息表
+                    List<NotifyOutboxEntity> rows = likeList.stream()
+                            .map(it -> {
+                                val rcpt = commentAuthorMap.get(it.getCommentId());
+                                if (rcpt == null) return null; // 评论不存在就丢弃
+                                long newId;
+                                try {
+                                    newId = IdUtils.getID(idGen);
+                                } catch (Exception e) {
+                                    log.error("获取id异常", e);
+                                    return null;
+                                }
+                                return NotifyOutboxEntity.builder()
+                                        .id(newId)
+                                        .commentId(it.getCommentId())
+                                        .userId(it.getUserId())
+                                        .recipientUserId(rcpt)
+                                        .status(NotifyOutboxStatusEnum.NEW)
+                                        .build();
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    if (!rows.isEmpty()) {
+                        notifyOutboxService.saveBatch(rows);
+                    }
+                });
             }
         } catch (Exception e) {
             log.error("点赞批量写库失败:{}", likeList, e);

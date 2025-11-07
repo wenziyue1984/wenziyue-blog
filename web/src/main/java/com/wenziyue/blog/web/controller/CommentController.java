@@ -38,7 +38,7 @@ public class CommentController {
     }
 
     @Operation(summary = "点赞评论", description = "点赞评论")
-    @GetMapping("/likeComment/{articleId}/{commentId}")
+    @GetMapping("/likeComment/{commentId}")
     @PreAuthorize("hasAuthority('USER')")
     public void likeComment(@Parameter(description = "点赞评论参数", required = true) @PathVariable Long commentId) {
         bizCommentService.likeComment(commentId, authHelper.getCurrentUser().getId());

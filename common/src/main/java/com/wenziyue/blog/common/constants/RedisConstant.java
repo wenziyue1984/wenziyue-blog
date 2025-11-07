@@ -160,4 +160,11 @@ public interface RedisConstant {
      * blog:chat:session:msg:lastTime:{userId}
      */
     String CHAT_SESSION_MSG_LAST_TIME_KEY = "blog:chat:session:msg:last:time:";
+
+    /**
+     * 通知消息发送状态
+     * blog:notify:outbox:has:sent:{notifyId}
+     */
+    String NOTIFY_OUTBOX_HAS_SENT_KEY = "blog:notify:outbox:has:sent:";
+
 }
