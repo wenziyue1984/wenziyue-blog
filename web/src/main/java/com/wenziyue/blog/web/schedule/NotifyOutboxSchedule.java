@@ -12,6 +12,8 @@ import lombok.val;
 import lombok.var;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -31,9 +33,19 @@ public class NotifyOutboxSchedule {
     private final NotifyOutboxService notifyOutboxService;
     private final RocketMQTemplate rocketMQTemplate;
     private final AppInstanceId appInstanceId;
+    private final Environment env;
 
     @Scheduled(fixedDelay = 2000)
     public void notifyOutbox() {
+
+        if (env.acceptsProfiles(Profiles.of("dev"))) {
+            log.info("当前环境为开发环境，每五分钟处理一次本地消息表，要不然控制台全是sql日志，很烦");
+            try {
+                Thread.sleep(5*6000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         // TODO: 2025/11/4 处理发送失败和发送超时的消息，暂时先不处理，后续再说
 

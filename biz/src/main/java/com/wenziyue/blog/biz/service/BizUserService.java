@@ -35,4 +35,16 @@ public interface BizUserService {
 
     @Transactional
     void resetPassword(UpdatePasswordDTO dto);
+
+    @Transactional
+    void followUser(Long userId);
+
+    @Transactional
+    void unFollowUser(Long userId);
+
+    @Transactional(readOnly = true)
+    PageResult<UserInfoDTO> pageFollowUser(FollowUserPageDTO dto);
+
+    @Transactional(readOnly = true)
+    PageResult<UserInfoDTO> pageFansUser(FansUserPageDTO dto);
 }

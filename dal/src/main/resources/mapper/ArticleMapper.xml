@@ -3,7 +3,8 @@
 <mapper namespace="com.wenziyue.blog.dal.mapper.ArticleMapper">
 
     <select id="page" resultType="com.wenziyue.blog.dal.entity.ArticleEntity">
-        select t0.id as id, t0.title as title, t0.cover_url as coverUrl, t0.view_count as viewCount, t0.like_count as likeCount, t0.slug as slug, t0.is_top as isTop, t0.status as status
+        select t0.id as id, t0.title as title, t0.cover_url as coverUrl, t0.view_count as viewCount, t0.like_count as
+        likeCount, t0.slug as slug, t0.is_top as isTop, t0.status as status
         from TB_WZY_BLOG_ARTICLE t0
         <if test="dto.tagId != null">
             inner join TB_WZY_BLOG_ARTICLE_TAG t1 on t0.id = t1.article_id
@@ -25,6 +26,41 @@
             and t1.tag_id = #{dto.tagId} and t1.deleted = 0
         </if>
         order by t0.user_id desc, t0.is_top desc, t0.sort desc, t0.update_time desc
+    </select>
+
+<!--    <select id="feed" resultType="com.wenziyue.blog.dal.dto.ArticlePageDTO">-->
+<!--        select t0.id         as articleId,-->
+<!--               t0.title      as title,-->
+<!--               t0.cover_url  as coverUrl,-->
+<!--               t0.user_id    as userId,-->
+<!--               t2.name       as name,-->
+<!--               t2.avatar_url as avatarUrl-->
+<!--        from TB_WZY_BLOG_ARTICLE t0-->
+<!--                 inner join TB_WZY_BLOG_USER_FOLLOW t1 on t0.user_id = t1.follow_user_id-->
+<!--                 inner join TB_WZY_BLOG_USER t2 on t0.user_id = t2.id-->
+<!--        where t0.deleted = 0-->
+<!--          and t1.deleted = 0-->
+<!--          and t0.status = 0-->
+<!--          and t2.deleted = 0-->
+<!--          and t2.status = 0-->
+<!--          and t1.user_id = #{userId}-->
+<!--          and t0.create_time &lt; #{lastTime}-->
+<!--        order by t0.create_time desc-->
+<!--    </select>-->
+
+    <select id="feed" resultType="com.wenziyue.blog.dal.dto.ArticlePageDTO">
+        select t2.id         as articleId,
+               t2.title      as title,
+               t2.cover_url  as coverUrl,
+               t2.user_id    as userId,
+               t1.name       as name,
+               t1.avatar_url as avatarUrl
+        from TB_WZY_BLOG_USER_FOLLOW t0
+                 inner join TB_WZY_BLOG_USER t1 on t0.follow_user_id = t1.id and t1.deleted = 0 and t1.status = 0
+                 inner join TB_WZY_BLOG_ARTICLE t2 on t2.user_id = t0.follow_user_id and t2.deleted = 0 and t2.status = 0 and t2.create_time &lt; #{lastTime}
+        where t0.deleted = 0
+          and t0.user_id = #{userId}
+        order by t2.create_time desc, t2.id desc
     </select>
 
 </mapper>

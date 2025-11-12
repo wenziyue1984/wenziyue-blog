@@ -71,6 +71,7 @@ public enum BlogResultCode implements IResultCode {
     CHAT_SESSION_LAST_SEQ_ERROR("60400", "获取会话last_seq失败"),
     CHAT_SESSION_EMPTY("60410", "会话不存在"),
 
+    NOTIFY_NOT_EXIST("60420", "通知不存在"),
     ;
 
     private final String code;

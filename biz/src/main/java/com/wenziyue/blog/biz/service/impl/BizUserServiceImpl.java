@@ -10,6 +10,8 @@ import com.wenziyue.blog.common.exception.BlogResultCode;
 import com.wenziyue.blog.common.utils.BlogUtils;
 import com.wenziyue.blog.dal.dto.*;
 import com.wenziyue.blog.dal.entity.UserEntity;
+import com.wenziyue.blog.dal.entity.UserFollowEntity;
+import com.wenziyue.blog.dal.service.UserFollowService;
 import com.wenziyue.blog.dal.service.UserService;
 import com.wenziyue.framework.common.CommonCode;
 import com.wenziyue.framework.exception.ApiException;
@@ -41,6 +43,7 @@ public class BizUserServiceImpl implements BizUserService {
     private final JwtUtils jwtUtils;
     private final AuthHelper authHelper;
     private final SecurityUtils securityUtils;
+    private final UserFollowService userFollowService;
 
     @Value("${wenziyue.security.expire}")
     private long expire;
@@ -243,6 +246,46 @@ public class BizUserServiceImpl implements BizUserService {
         userService.updateById(userEntity);
         // 重设密码后需要重新登录，因此删除用户所有登录token
         securityUtils.clearUserAllToken(userEntity.getId());
+    }
+
+    @Override
+    public void followUser(Long userId) {
+        val currentUserId = authHelper.getCurrentUser().getId();
+        // 是否已经关注
+        val followed = userFollowService.getOne(Wrappers.<UserFollowEntity>lambdaQuery()
+                .eq(UserFollowEntity::getUserId, currentUserId)
+                .eq(UserFollowEntity::getFollowUserId, userId));
+        if (followed != null) {
+            return;
+        }
+        userFollowService.save(UserFollowEntity.builder()
+                .id(IdUtils.getID(idGen))
+                .userId(currentUserId)
+                .followUserId(userId)
+                .build());
+    }
+
+    @Override
+    public void unFollowUser(Long userId) {
+        val currentUserId = authHelper.getCurrentUser().getId();
+        // 确认是否关注
+        val followed = userFollowService.getOne(Wrappers.<UserFollowEntity>lambdaQuery()
+                .eq(UserFollowEntity::getUserId, currentUserId)
+                .eq(UserFollowEntity::getFollowUserId, userId));
+        if (followed == null) {
+            return;
+        }
+        userFollowService.physicalDelete(currentUserId, userId);
+    }
+
+    @Override
+    public PageResult<UserInfoDTO> pageFollowUser(FollowUserPageDTO dto) {
+        return userFollowService.pageFollowUser(dto, authHelper.getCurrentUser().getId());
+    }
+
+    @Override
+    public PageResult<UserInfoDTO> pageFansUser(FansUserPageDTO dto) {
+        return userFollowService.pageFansUser(dto, authHelper.getCurrentUser().getId());
     }
 
 }

@@ -61,7 +61,29 @@ public class UserController {
         bizUserService.updatePassword(dto);
     }
 
-    // TODO: 2025/7/31  关注用户
+    @Operation(summary = "关注用户", description = "关注用户")
+    @PostMapping("/followUser/{userId}")
+    public void followUser(@Parameter(description = "关注用户参数", required = true) @PathVariable("userId") Long userId) {
+        bizUserService.followUser(userId);
+    }
+
+    @Operation(summary = "取关用户", description = "取关用户")
+    @PostMapping("/unFollowUser/{userId}")
+    public void unFollowUser(@Parameter(description = "取关用户参数", required = true) @PathVariable("userId") Long userId) {
+        bizUserService.unFollowUser(userId);
+    }
+
+    @Operation(summary = "分页查看关注的人", description = "分页查看关注的人")
+    @PostMapping("/pageFollowUser")
+    public PageResult<UserInfoDTO> pageFollowUser(@Parameter(description = "分页请求参数", required = true) @Valid FollowUserPageDTO dto) {
+        return bizUserService.pageFollowUser(dto);
+    }
+
+    @Operation(summary = "分页查看粉丝", description = "分页查看粉丝")
+    @PostMapping("/pageFansUser")
+    public PageResult<UserInfoDTO> pageFansUser(@Parameter(description = "分页请求参数", required = true) @Valid FansUserPageDTO dto) {
+        return bizUserService.pageFansUser(dto);
+    }
 
     // 管理后台
 

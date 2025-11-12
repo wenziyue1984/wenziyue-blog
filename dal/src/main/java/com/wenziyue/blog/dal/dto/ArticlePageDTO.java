@@ -17,15 +17,25 @@ public class ArticlePageDTO extends PageRequest {
     @Schema(description = "用户id", example = "1")
     private Long userId;
 
+    @Schema(description = "用户name", example = "userName")
+    private String userName;
+
+    @Schema(description = "用户头像", example = "avatarUrl")
+    private String avatarUrl;
+
     @Schema(description = "文章id", example = "1")
     private Long articleId;
 
     @Schema(description = "文章标题", example = "title")
     private String title;
 
+    @Schema(description = "文章封面图", example = "coverUrl")
+    private String coverUrl;
+
     @Schema(description = "文章标签", example = "tag")
     private String tagId;
 
     @Schema(description = "过滤隐藏文章", hidden = true)
     private boolean filterHidden;
+
 }

@@ -16,3 +16,19 @@ CREATE TABLE IF NOT EXISTS TB_WZY_BLOG_NOTIFY_OUTBOX
     INDEX `idx_owner_status_id` (owner, status, id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT '本地消息表';
+
+-- 通知收件箱表
+CREATE TABLE IF NOT EXISTS TB_WZY_BLOG_NOTIFY_INBOX
+(
+    `id`                BIGINT    NOT NULL PRIMARY KEY COMMENT '主键id',
+    `version`           INT       NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `deleted`           TINYINT   NOT NULL DEFAULT 0 COMMENT '是否删除 0-正常 1-删除',
+    `create_time`       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `recipient_user_id` BIGINT    NOT NULL COMMENT '接收者ID',
+    `actor_id`          BIGINT    NOT NULL COMMENT '行为者ID',
+    `type`              TINYINT   NOT NULL COMMENT '通知类型',
+    `ref_id`            BIGINT    NOT NULL COMMENT '关联ID',
+    `status`            TINYINT   NOT NULL DEFAULT 0 COMMENT '状态: 0 NEW 新消息/ 1 READ 已读'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT '通知收件箱表';

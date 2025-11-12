@@ -7,10 +7,14 @@ import com.wenziyue.blog.dal.dto.ArticlePageDTO;
 import com.wenziyue.blog.dal.entity.ArticleEntity;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
+
 /**
  * @author wenziyue
  */
 public interface ArticleMapper extends BaseMapper<ArticleEntity>{
 
     IPage<ArticleEntity> page(Page<?> page, @Param("dto") ArticlePageDTO dto);
+
+    IPage<ArticlePageDTO> feed(Page<Object> pageParam, @Param("lastTime") LocalDateTime lastTime, @Param("userId") Long id);
 }

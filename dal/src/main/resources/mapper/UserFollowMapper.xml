@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wenziyue.blog.dal.mapper.UserFollowMapper">
+
+    <select id="pageFollowUser" resultType="com.wenziyue.blog.dal.dto.UserInfoDTO">
+        SELECT t1.id as id,
+        t1.avatar_url as createTime,
+        t1.status as userId,
+        t1.name as userName,
+        t1.role as role,
+        FROM TB_WZY_BLOG_USER_FOLLOW t0
+        LEFT JOIN TB_WZY_BLOG_USER t1 ON t0.follow_user_id = t1.id
+        WHERE t0.user_id = #{userId}
+        <if test="name != null">
+            and t1.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sort == 1">
+                t0.create_time DESC, t0.id DESC
+            </when>
+            <otherwise>
+                t0.create_time ASC, t0.id ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="pageFansUser" resultType="com.wenziyue.blog.dal.dto.UserInfoDTO">
+        SELECT t1.id as id,
+        t1.avatar_url as createTime,
+        t1.status as userId,
+        t1.name as userName,
+        t1.role as role,
+        FROM TB_WZY_BLOG_USER_FOLLOW t0
+        LEFT JOIN TB_WZY_BLOG_USER t1 ON t0.user_id = t1.id
+        WHERE t0.follow_user_id = #{userId}
+        <if test="name != null">
+            and t1.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sort == 1">
+                t0.create_time DESC
+            </when>
+            <otherwise>
+                t0.create_time ASC
+            </otherwise>
+        </choose>
+        , t0.id ASC
+    </select>
+
+</mapper>
